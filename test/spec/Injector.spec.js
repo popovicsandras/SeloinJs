@@ -162,7 +162,7 @@ describe('Injector container', function (){
 
     describe('injector injection', function () {
 
-        it('should inject the service locator container into the resolved object\'s constructor', function() {
+        it('should use the constructor prepender injector by default', function() {
 
             class App {
                 constructor(injector) {
