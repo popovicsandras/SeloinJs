@@ -1,6 +1,6 @@
 'use strict';
 
-const Container = require('../../lib/Container.js');
+const Injector = require('../../lib/Container.js');
 
 class TestClass {
     constructor (injector, str, func, obj) {
@@ -10,17 +10,72 @@ class TestClass {
     }
 }
 
-class TestClass2 {
-
-}
+class TestClass2 {}
 
 describe('Injector container', function (){
+
+    describe('constructor', function () {
+
+        describe('namespace', function () {
+
+            it('should create injector with "Composition Root" namespace by default', function () {
+
+                const injector = new Injector();
+
+                expect(injector.namespace).to.be.equal('Composition Root');
+            });
+
+            it('should create injector with passed parameter as namespace if given', function () {
+
+                const injector = new Injector('Planet Namek');
+
+                expect(injector.namespace).to.be.equal('Planet Namek');
+            });
+
+            it('should create the namespace property as a readonly property', function () {
+                const injector = new Injector();
+
+                function setNamespace() { injector.namespace = 'Modified'; }
+
+                expect(setNamespace).to.throw();
+                expect(injector.namespace).to.be.equal('Composition Root');
+            });
+        });
+
+        describe('parent', function () {
+
+            it('should create injector with null namespace by default', function () {
+
+                const injector = new Injector();
+
+                expect(injector.__parent).to.be.null;
+            });
+
+            it('should create injector with passed parameter as parent if given', function () {
+
+                const parentContainer = {},
+                    injector = new Injector('Planet Namek', parentContainer);
+
+                expect(injector.__parent).to.be.equal(parentContainer);
+            });
+
+            it('should create the __parent property as a readonly property', function () {
+                const parentContainer = {},
+                    injector = new Injector('Planet Namek', parentContainer);
+
+                function setParent() { injector.__parent = {}; }
+
+                expect(setParent).to.throw();
+                expect(injector.__parent).to.be.equal(parentContainer);
+            });
+        });
+    });
 
     describe('register', function() {
 
         it('should not overwrite an already registered service', function() {
 
-            const injector = new Container();
+            const injector = new Injector();
 
             injector.register('TestClass', TestClass);
             try {
@@ -33,7 +88,7 @@ describe('Injector container', function (){
 
         it('should throw an Error if the dependency to be registered is already registered', function() {
 
-            const injector = new Container();
+            const injector = new Injector();
             injector.register('SupaDupaTestClass', TestClass);
 
             const testFunc = function() {
@@ -46,42 +101,60 @@ describe('Injector container', function (){
 
     describe('resolve', function() {
 
-        it('should throw an Error if the dependency to be resolved is not registered', function() {
+        describe('a service (as factory)', function () {
 
-            const injector = new Container();
+            it('should throw an Error if the dependency to be resolved is not registered', function() {
 
-            const testFunc = function() {
-                injector.resolve('test');
-            };
+                const injector = new Injector();
 
-            expect(testFunc).to.throw(Error, 'Dependency not found: test');
+                const testFunc = function() {
+                    injector.resolve('test');
+                };
+
+                expect(testFunc).to.throw(Error, 'Dependency not found: test');
+            });
+
+            it('should resolve the registered service', function() {
+
+                const injector = new Injector();
+
+                injector.register('TestClass', TestClass);
+
+                expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
+            });
+
+            it('should resolve the registered service with additional arguments', function() {
+
+                const expectedStr = 'Diva Plavalaguna 5X',
+                    expectedFunc = function() { return 'Multipass!'; },
+                    expectedObj = {
+                        color: 'super-green'
+                    },
+                    injector = new Injector();
+
+                injector.register('TestClass', TestClass);
+
+                const instance = injector.resolve('TestClass', expectedStr, expectedFunc, expectedObj);
+                expect(instance.str).to.be.equal(expectedStr);
+                expect(instance.func).to.be.equal(expectedFunc);
+                expect(instance.obj).to.be.equal(expectedObj);
+            });
         });
 
-        it('should resolve the registered service', function() {
+        describe('an instance (as singleton)', function () {
 
-            const injector = new Container();
+            it('should resolve the registered instance', function () {
+                const Cache = {cache: 'whatever'},
+                    injector = new Injector();
 
-            injector.register('TestClass', TestClass);
+                injector.register('Cache', Cache);
 
-            expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
+                expect(injector.resolve('Cache')).to.be.equal(Cache);
+            });
         });
+    });
 
-        it('should resolve the registered service with additional arguments', function() {
-
-            const expectedStr = 'Diva Plavalaguna 5X',
-                expectedFunc = function() { return 'Multipass!'; },
-                expectedObj = {
-                    color: 'super-green'
-                },
-                injector = new Container();
-
-            injector.register('TestClass', TestClass);
-
-            const instance = injector.resolve('TestClass', expectedStr, expectedFunc, expectedObj);
-            expect(instance.str).to.be.equal(expectedStr);
-            expect(instance.func).to.be.equal(expectedFunc);
-            expect(instance.obj).to.be.equal(expectedObj);
-        });
+    describe('injector injection', function () {
 
         it('should inject the service locator container into the resolved object\'s constructor', function() {
 
@@ -91,11 +164,15 @@ describe('Injector container', function (){
                 }
             }
 
-            const injector = new Container();
+            const injector = new Injector();
             injector.register('TestClass', TestClass);
             injector.register('App', App);
 
-            const app = injector.resolve('App');
+            const start = function() {
+                injector.resolve('App');
+            };
+
+            expect(start).to.not.throw();
         });
     });
 
@@ -118,7 +195,7 @@ describe('Injector container', function (){
                 }
             }
 
-            const injector = new Container();
+            const injector = new Injector();
             injector.register('App', App);
             injector.register('Level1', Level1);
             injector.register('TestClass', TestClass);
@@ -128,7 +205,7 @@ describe('Injector container', function (){
             expect(app.level1.test).to.be.instanceOf(TestClass2);
         });
 
-        it('should try to resolve in parent\'s container if not presen in the current one', function() {
+        it('should try to resolve in parent\'s container if service is not present in the current one', function() {
 
             class App {
                 constructor(injector) {
@@ -152,7 +229,7 @@ describe('Injector container', function (){
                 }
             }
 
-            const injector = new Container();
+            const injector = new Injector();
             injector.register('App', App);
             injector.register('Level1', Level1);
             injector.register('Level2', Level2);
@@ -179,7 +256,7 @@ describe('Injector container', function (){
                 }
             }
 
-            const injector = new Container();
+            const injector = new Injector();
             injector.register('App', App);
             injector.register('Level1', Level1);
             injector.register('TestClass', TestClass);
@@ -199,7 +276,7 @@ describe('Injector container', function (){
                 }
             }
 
-            const injector = new Container();
+            const injector = new Injector();
             injector.register('App', App);
 
             const app = injector.resolve('App');
@@ -210,6 +287,39 @@ describe('Injector container', function (){
 
             expect(setNamespace).to.throw();
             expect(app.injector.namespace).to.be.equal('');
+        });
+
+        it('should set __parent as a readonly property', function() {
+
+            class App {
+                constructor(rootInjector) {
+                    this.injector = rootInjector.createNamespace();
+                }
+            }
+
+            const injector = new Injector();
+            injector.register('App', App);
+
+            const app = injector.resolve('App');
+
+            const setParent = function() {
+                app.injector.__parent = {}
+            };
+
+            expect(setParent).to.throw();
+        });
+    });
+
+    describe('reset', function() {
+
+        it('should reset the container\'s registered providers', function () {
+            const injector = new Injector();
+            injector.register('test', TestClass);
+            const testFunc = function () { injector.resolve('test'); };
+
+            injector.reset();
+
+            expect(testFunc).to.throw(Error, 'Dependency not found: test');
         });
     });
 });
