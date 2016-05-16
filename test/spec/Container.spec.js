@@ -3,7 +3,7 @@
 const Container = require('../../lib/Container.js');
 
 class TestClass {
-    constructor (str, func, obj) {
+    constructor (loc8r, str, func, obj) {
         this.str = str;
         this.func = func;
         this.obj = obj;
@@ -76,5 +76,20 @@ describe('Service Locator container', function (){
         };
 
         expect(testFunc).to.throw(Error, 'Dependency is already registered: SupaDupaTestClass -> TestClass');
+    });
+
+    it('should inject the service locator container into the resolved object\'s constructor', function() {
+
+        class App {
+            constructor(loc8r) {
+                loc8r.resolve('TestClass');
+            }
+        }
+
+        const container = new Container();
+        container.register('TestClass', TestClass);
+        container.register('App', App);
+
+        const app = container.resolve('App');
     });
 });
