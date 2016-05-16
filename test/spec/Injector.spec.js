@@ -1,6 +1,6 @@
 'use strict';
 
-const Injector = require('../../lib/Container.js');
+const Injector = require('../../lib/Injector.js');
 
 class TestClass {
     constructor (injector, str, func, obj) {
@@ -308,6 +308,24 @@ describe('Injector container', function (){
 
             expect(setParent).to.throw();
         });
+
+        it('should set the loader if specified in parameter', function() {
+
+            class App {
+                constructor(rootInjector) {
+                    this.injector = rootInjector.createNamespace();
+                }
+            }
+
+            const injector = new Injector();
+
+            injector.loader = {load: function() {}};
+            injector.register('App', App);
+
+            const app = injector.resolve('App');
+
+            expect(app.injector.loader).to.be.equal(injector.loader);
+        });
     });
 
     describe('reset', function() {
@@ -320,6 +338,61 @@ describe('Injector container', function (){
             injector.reset();
 
             expect(testFunc).to.throw(Error, 'Dependency not found: test');
+        });
+    });
+
+    describe('load', function () {
+
+        var jsonLoaderMock;
+
+        beforeEach(function() {
+            jsonLoaderMock = {
+                load: function(filename, registrator) {
+                    registrator('Factory', function(injector, name) { this.name = `Factory: ${name}`; });
+                    registrator('Singleton', { id: 'Singleton' });
+                }
+            };
+
+            sinon.spy(jsonLoaderMock, 'load');
+        });
+
+        afterEach(function() {
+            jsonLoaderMock.load.restore();
+        });
+
+        it('should load the appropriate config loader\'s load method', function () {
+
+            const injector = new Injector();
+            injector.loader = jsonLoaderMock;
+
+            injector.load('app-di.json');
+
+            expect(jsonLoaderMock.load).to.have.been.calledWith('app-di.json');
+        });
+
+        it('should register all the services returned by the loader', function () {
+
+            const injector = new Injector();
+            injector.loader = jsonLoaderMock;
+            injector.load('app-di.json');
+
+            const instance = injector.resolve('Factory', 'Kakarot'),
+                singleton = injector.resolve('Singleton');
+
+            expect(instance.name).to.be.equal('Factory: Kakarot');
+            expect(singleton.id).to.be.equal('Singleton');
+        });
+
+        it('should use the default commonjs loader by default', function () {
+
+            const injector = new Injector();
+            injector.load(__dirname + '/../fixtures/di-config.js');
+
+            const songoku = injector.resolve('Songoku'),
+                Piccolo = injector.resolve('Piccolo');
+
+            expect(songoku.dragonball).to.be.equal('4 star');
+            expect(Piccolo.id).to.be.equal('Piccolo');
         });
     });
 });
