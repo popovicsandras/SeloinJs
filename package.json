@@ -1,7 +1,7 @@
 {
-  "name": "loc8r",
+  "name": "service-locator-injection",
   "version": "0.0.1",
-  "description": "Javascript Service Locator",
+  "description": "Javascript Service Locator Injection component",
   "main": "index.js",
   "scripts": {
     "pretest": "jshint --reporter=node_modules/jshint-stylish **/**.js",

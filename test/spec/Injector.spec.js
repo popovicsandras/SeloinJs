@@ -27,7 +27,7 @@ describe('Injector container', function (){
 
             it('should create injector with passed parameter as namespace if given', function () {
 
-                const injector = new Injector('Planet Namek');
+                const injector = new Injector({name: 'Planet Namek'});
 
                 expect(injector.namespace).to.be.equal('Planet Namek');
             });
@@ -54,14 +54,20 @@ describe('Injector container', function (){
             it('should create injector with passed parameter as parent if given', function () {
 
                 const parentContainer = {},
-                    injector = new Injector('Planet Namek', parentContainer);
+                    injector = new Injector({
+                        name: 'Planet Namek',
+                        parent: parentContainer
+                    });
 
                 expect(injector.__parent).to.be.equal(parentContainer);
             });
 
             it('should create the __parent property as a readonly property', function () {
                 const parentContainer = {},
-                    injector = new Injector('Planet Namek', parentContainer);
+                    injector = new Injector({
+                        name: 'Planet Namek',
+                        parent: parentContainer
+                    });
 
                 function setParent() { injector.__parent = {}; }
 
@@ -309,7 +315,7 @@ describe('Injector container', function (){
             expect(setParent).to.throw();
         });
 
-        it('should set the loader if specified in parameter', function() {
+        it('should set the loader to be the same as the parent\'s one', function() {
 
             class App {
                 constructor(rootInjector) {
@@ -317,14 +323,14 @@ describe('Injector container', function (){
                 }
             }
 
-            const injector = new Injector();
+            const loader = { load: function() {} },
+                injector = new Injector({ loader: loader });
 
-            injector.loader = {load: function() {}};
             injector.register('App', App);
 
             const app = injector.resolve('App');
 
-            expect(app.injector.loader).to.be.equal(injector.loader);
+            expect(app.injector.loader).to.be.equal(loader);
         });
     });
 
@@ -362,8 +368,7 @@ describe('Injector container', function (){
 
         it('should load the appropriate config loader\'s load method', function () {
 
-            const injector = new Injector();
-            injector.loader = jsonLoaderMock;
+            const injector = new Injector({loader: jsonLoaderMock});
 
             injector.load('app-di.json');
 
@@ -372,8 +377,7 @@ describe('Injector container', function (){
 
         it('should register all the services returned by the loader', function () {
 
-            const injector = new Injector();
-            injector.loader = jsonLoaderMock;
+            const injector = new Injector({loader: jsonLoaderMock});
             injector.load('app-di.json');
 
             const instance = injector.resolve('Factory', 'Kakarot'),
