@@ -236,6 +236,42 @@ describe('Injector container', function (){
                 expect(start).to.not.throw();
             });
         });
+
+        describe('Prototype poisoning', function () {
+
+            var injector,
+                PrototypePoisoner;
+
+            before(function() {
+                PrototypePoisoner = require('../../lib/injection-strategies/PrototypePoisoner.js');
+            });
+
+            beforeEach(function() {
+                injector = new Injector({
+                    injectMethod: PrototypePoisoner
+                });
+            });
+
+            it('should inject the injector to the wrapper prototype temporary [Function declarations]', function() {
+
+                var appInstance = null;
+                const App = function() {
+                    this.injector.resolve('TestClass');
+                };
+                const TestClass = function() {};
+
+                injector.register('App', App);
+                injector.register('TestClass', TestClass);
+
+                const start = function() {
+                    appInstance = injector.resolve('App');
+                };
+
+                expect(start).to.not.throw();
+                expect(appInstance.injector).to.be.equal(injector);
+                expect(App.prototype.injector).to.be.undefined;
+            });
+        });
     });
 
     describe('createNamespace', function() {
