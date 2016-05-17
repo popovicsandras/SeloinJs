@@ -162,23 +162,79 @@ describe('Injector container', function (){
 
     describe('injector injection', function () {
 
-        it('should use the constructor prepender injector by default', function() {
+        describe('Constructor parameter prepending', function () {
 
-            class App {
-                constructor(injector) {
-                    injector.resolve('TestClass');
+            it('should be used by default', function() {
+
+                class App {
+                    constructor(injector) {
+                        injector.resolve('TestClass');
+                    }
                 }
-            }
 
-            const injector = new Injector();
-            injector.register('TestClass', TestClass);
-            injector.register('App', App);
+                const injector = new Injector();
+                injector.register('TestClass', TestClass);
+                injector.register('App', App);
 
-            const start = function() {
-                injector.resolve('App');
-            };
+                const start = function() {
+                    injector.resolve('App');
+                };
 
-            expect(start).to.not.throw();
+                expect(start).to.not.throw();
+            });
+        });
+
+        describe('Constructor parameter appending', function () {
+
+            var injector,
+                ConstructorAppender;
+
+            before(function() {
+                ConstructorAppender = require('../../lib/injection-strategies/ConstructorAppender.js');
+            });
+
+            beforeEach(function() {
+                injector = new Injector({
+                    injectMethod: ConstructorAppender
+                });
+                injector.register('TestClass', TestClass);
+            });
+
+            it('should inject the injector to the end of constructor\'s parameter list', function() {
+
+                class App {
+                    constructor(param1, param2) {
+                        const injector = arguments[arguments.length - 1];
+                        injector.resolve('TestClass');
+                    }
+                }
+
+                injector.register('App', App);
+
+                const start = function() {
+                    injector.resolve('App', 'first param', 'second param');
+                };
+
+                expect(start).to.not.throw();
+            });
+
+            it('should inject the injector to the end of constructor\'s parameter list even if there are optional parameters', function() {
+
+                class App {
+                    constructor(optional1 = null, optional2 = '') {
+                        const injector = arguments[arguments.length - 1];
+                        injector.resolve('TestClass');
+                    }
+                }
+
+                injector.register('App', App);
+
+                const start = function() {
+                    injector.resolve('App');
+                };
+
+                expect(start).to.not.throw();
+            });
         });
     });
 
