@@ -252,16 +252,23 @@ describe('Injector container', function (){
                 });
             });
 
-            it('should inject the injector to the wrapper prototype temporary [Function declarations]', function() {
+            it('should work properly in case of extended classes too', function() {
 
                 var appInstance = null;
-                const App = function() {
-                    this.injector.resolve('TestClass');
-                };
-                const TestClass = function() {};
+                class Base {}
+                class App extends Base {
+                    constructor() {
+                        super();
+                        this.injector.resolve('TestClass');
+                        this.injector.resolve('TestClass2');
+                    }
+                }
+                class TestClass {}
+                class TestClass2 {}
 
                 injector.register('App', App);
                 injector.register('TestClass', TestClass);
+                injector.register('TestClass2', TestClass2);
 
                 const start = function() {
                     appInstance = injector.resolve('App');
