@@ -1,20 +1,29 @@
 {
-  "name": "service-locator-injection",
+  "name": "depex",
   "version": "0.0.1",
-  "description": "Javascript Service Locator Injection component",
+  "description": "Dependency Explorer - Javascript Service Locator Injection component",
   "main": "index.js",
   "scripts": {
-    "pretest": "jshint --reporter=node_modules/jshint-stylish **/**.js",
+    "build": "webpack -p --config webpack.build.config.js",
+    "pretest": "eslint **/**.js",
     "test": "mocha --harmony 'test/setup.js' 'test/**/**.spec.js'"
   },
   "author": "Andras Popovics",
   "license": "ISC",
   "devDependencies": {
+    "babel-core": "^6.9.0",
+    "babel-eslint": "^6.0.4",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
     "chai": "^3.5.0",
+    "eslint": "^2.10.2",
+    "eslint-loader": "^1.3.0",
     "jshint": "^2.9.2",
     "jshint-stylish": "^2.2.0",
     "mocha": "^2.2.1",
     "sinon": "^1.17.4",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "webpack": "^1.13.0",
+    "webpack-dev-server": "^1.14.1"
   }
 }
