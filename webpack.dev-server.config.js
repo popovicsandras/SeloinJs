@@ -10,7 +10,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, "build"),
         publicPath: '/',
-        filename: "depex.js",
+        filename: "seloin.js",
         libraryTarget: 'umd'
     },
 
