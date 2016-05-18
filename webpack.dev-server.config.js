@@ -1,6 +1,8 @@
 var path = require('path'),
     webpack = require('webpack');
 
+var commonsPlugin = new webpack.optimize.CommonsChunkPlugin('webpack-common.js');
+
 module.exports = {
     debug: true,
     context: path.resolve('lib'),
@@ -8,7 +10,7 @@ module.exports = {
     output: {
         path: path.join(__dirname, "build"),
         publicPath: '/',
-        filename: "bundle.js",
+        filename: "depex.js",
         libraryTarget: 'umd'
     },
 
@@ -29,6 +31,10 @@ module.exports = {
             { test: /\.js?$/, loader: 'babel-loader', exclude: /node_modules/ }
         ]
     },
+
+     plugins: [
+         commonsPlugin
+     ],
 
     resolve: {
         extensions: ['', '.js']

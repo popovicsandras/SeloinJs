@@ -1,0 +1,40 @@
+<html>
+<head>
+    <title>Todolist demo application</title>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="webpack-common.js"></script>
+    <script src="bower_components/requirejs/require.js"></script>
+
+    <script>
+        document.currentScript.src ='';
+        requirejs(["./depex.js"], function(depex) {
+            var injector = new depex.Injector({
+                injectMethod: depex.Strategies.prototypePoisoner
+            });
+
+            function Test(param) {
+                var currentInjector = this.injector.createNamespace('namespace from Test');
+                function Test3(param) {
+                    this.param = param.toUpperCase();
+                }
+                currentInjector.register('Test2', Test3);
+
+                this.test2 = currentInjector.resolve('Test2', param);
+            }
+
+            function Test2(param) {
+                this.param = param;
+            }
+
+            injector.register('Test', Test);
+            injector.register('Test2', Test2);
+
+            var test = injector.resolve('Test', 'lajoska');
+
+            console.log(test);
+        });
+    </script>
+</body>
+</html>
