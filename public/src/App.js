@@ -1,4 +1,4 @@
-define(['backbone.marionette', 'seloin', 'MainLayout'], function (Marionette, Seloin, MainLayout) {
+define(['backbone.marionette', 'seloin', 'app.services'], function (Marionette, Seloin, AppDependencies) {
 
     return Marionette.Application.extend({
         initialize: function(options) {
@@ -12,7 +12,7 @@ define(['backbone.marionette', 'seloin', 'MainLayout'], function (Marionette, Se
             this.rootInjector = new Seloin.Injector({
                 injectMethod: Seloin.Strategies.prototypePoisoner
             });
-            this.rootInjector.register('MainLayout', MainLayout);
+            this.rootInjector.load(AppDependencies);
         },
 
         onStart: function() {
