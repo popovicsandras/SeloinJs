@@ -1,6 +1,6 @@
 'use strict';
 
-const getPoisonedPrototypeInstance = require('../../../lib/injection-strategies/PrototypePoisoner.js');
+import { default as getPoisonedPrototypeInstance } from '../../../lib/injection-strategies/PrototypePoisoner.js';
 
 describe('Prototype poisoner', function () {
 
