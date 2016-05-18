@@ -489,7 +489,8 @@ describe('Injector container', function (){
         it('should use the default commonjs loader by default', function () {
 
             const injector = new Injector();
-            injector.load(__dirname + '/../fixtures/di-config.js');
+            // Relative path to webpack generated testfiles'
+            injector.load('../../../test/fixtures/di-config.js');
 
             const songoku = injector.resolve('Songoku'),
                 Piccolo = injector.resolve('Piccolo');
