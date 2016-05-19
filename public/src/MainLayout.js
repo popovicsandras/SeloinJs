@@ -8,8 +8,12 @@ define(['backbone.marionette', 'text!templates/MainLayout.html'], function (Mari
             content: "#content"
         },
 
-        initialize: function() {
-            console.log(this.injector);
+        onShow: function() {
+            var menuLayout = this.injector.resolve('MenuLayout'),
+                todoLayout = this.injector.resolve('TodoLayout');
+
+            this.menu.show(menuLayout);
+            this.content.show(todoLayout);
         }
     });
 

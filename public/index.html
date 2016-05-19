@@ -1,16 +1,17 @@
 <html>
 <head>
     <title>Example application</title>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
 </head>
 <body>
-    <div id="app"></div>
+    <div id="app" class="container"></div>
     <script src="webpack-common.js"></script>
     <script src="bower_components/requirejs/require.js"></script>
     <script src="require-config.js"></script>
 
     <script>
         document.currentScript.src ='';
-        require(['App'], function (App) {
+        require(['App', 'bootstrap'], function (App) {
             var app = new App({container: '#app'});
             app.start();
         });
