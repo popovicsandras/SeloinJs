@@ -1,3 +1,12 @@
 <td class="character-name"><%= name %></td>
-<td class="character-level"><%= level %></td>
 <td class="character-strength"><%= strength %></td>
+<td class="character-level"><%= powerLevel %></td>
+<td>
+    <button type="button" class="btn btn-default btn-sm decrease-value" aria-label="Left Align">
+        <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+    </button>
+    <span style="width:50px; display:inline-block; text-align:center;" class="character-exp"><%= exp %></span>
+    <button type="button" class="btn btn-default btn-sm increase-value" aria-label="Left Align">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </button>
+</td>

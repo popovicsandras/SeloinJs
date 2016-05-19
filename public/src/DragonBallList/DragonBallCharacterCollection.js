@@ -1,19 +1,22 @@
-define(['backbone'], function (Backbone) {
+define(['backbone', 'DragonBallList/DragonBallCharacterModel'], function (Backbone, DragonBallCharacterModel) {
 
     var DragonBallCharacterCollection = Backbone.Collection.extend({
+
+        model: DragonBallCharacterModel,
+
         load: function() {
             this.reset([{
                 name: 'Songoku',
-                level: '76',
-                strength: 100
+                strength: '76',
+                exp: 100
             },{
                 name: 'Majin Vegeta',
-                level: '79',
-                strength: 110
+                strength: '79',
+                exp: 110
             },{
                 name: 'Cell',
-                level: '62',
-                strength: 82
+                strength: '62',
+                exp: 82
             }]);
         }
     });

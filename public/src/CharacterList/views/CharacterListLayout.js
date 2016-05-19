@@ -1,7 +1,10 @@
-define(['backbone.marionette', 'text!../templates/CharacterListLayout.html'], function (Marionette, template) {
+define(['backbone.marionette'], function (Marionette) {
 
     var TodoLayoutView = Marionette.LayoutView.extend({
-        template: template,
+
+        initialize: function() {
+            this.template = this.injector.resolve('CharacterListLayoutTemplate');
+        },
 
         regions: {
             search: ".search",
