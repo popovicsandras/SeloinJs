@@ -1,4 +1,4 @@
-define(['backbone.marionette', 'text!templates/MainLayout.html'], function (Marionette, template) {
+define(['backbone.marionette', 'text!templates/MainLayout.html', 'DragonBallList/db.services'], function (Marionette, template, DbDependencies) {
 
     var AppLayoutView = Marionette.LayoutView.extend({
         template: template,
@@ -9,11 +9,17 @@ define(['backbone.marionette', 'text!templates/MainLayout.html'], function (Mari
         },
 
         onShow: function() {
-            var menuLayout = this.injector.resolve('MenuLayout'),
-                todoLayout = this.injector.resolve('TodoLayout');
-
+            var menuLayout = this.injector.resolve('MenuLayout');
             this.menu.show(menuLayout);
-            this.content.show(todoLayout);
+
+            var dragonBallContainer = this.injector.createNamespace();
+            for (var serviceName in DbDependencies) {
+                if (DbDependencies.hasOwnProperty(serviceName)) {
+                    dragonBallContainer.register(serviceName, DbDependencies[serviceName]);
+                }
+            }
+            var DragonBallCharacterListLayout = dragonBallContainer.resolve('CharacterListLayout');
+            this.content.show(DragonBallCharacterListLayout);
         }
     });
 

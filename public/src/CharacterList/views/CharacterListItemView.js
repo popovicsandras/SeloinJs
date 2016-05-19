@@ -1,4 +1,4 @@
-define(['backbone.marionette', 'text!../templates/ListItemView.html', 'underscore'], function (Marionette, template, _) {
+define(['backbone.marionette', 'text!../templates/CharacterListItemView.html', 'underscore'], function (Marionette, template, _) {
 
     var ListItemView = Marionette.ItemView.extend({
         tagName: 'tr',
