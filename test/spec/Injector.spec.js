@@ -275,6 +275,28 @@ describe('Injector container', function (){
 
     describe('createNamespace', function() {
 
+        it('should throw an error if createNamespace has no namespace', function() {
+
+            const injector = new Injector();
+
+            const createNamespace = function() {
+                injector.createNamespace();
+            };
+
+            expect(createNamespace).to.throw(`Namespace can't be empty`);
+        });
+
+        it('should throw an error if createNamespace is empty string', function() {
+
+            const injector = new Injector();
+
+            const createNamespace = function() {
+                injector.createNamespace('');
+            };
+
+            expect(createNamespace).to.throw(`Namespace can't be empty`);
+        });
+
         it('should create a new level in injector chain', function() {
 
             class App {
@@ -285,7 +307,7 @@ describe('Injector container', function (){
 
             class Level1 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createNamespace();
+                    const injector = rootInjector.createNamespace('Level2');
                     injector.register('TestClass', TestClass2);
 
                     this.test = injector.resolve('TestClass');
@@ -312,7 +334,7 @@ describe('Injector container', function (){
 
             class Level1 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createNamespace();
+                    const injector = rootInjector.createNamespace('whatever');
                     injector.register('ServiceFromLevel1', TestClass2);
                     this.level2 = injector.resolve('Level2');
                 }
@@ -320,7 +342,7 @@ describe('Injector container', function (){
 
             class Level2 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createNamespace();
+                    const injector = rootInjector.createNamespace('whatever2');
                     this.test = injector.resolve('TestClass');
                     this.test2 = injector.resolve('ServiceFromLevel1');
                 }
@@ -342,14 +364,14 @@ describe('Injector container', function (){
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createNamespace();
+                    this.injector = rootInjector.createNamespace('Composition Level 1');
                     this.level1 = this.injector.resolve('Level1');
                 }
             }
 
             class Level1 {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createNamespace('Composition Level 1');
+                    this.injector = rootInjector.createNamespace('Composition Level 2');
                 }
             }
 
@@ -361,15 +383,15 @@ describe('Injector container', function (){
             const app = injector.resolve('App');
 
             expect(injector.namespace).to.be.equal('Composition Root');
-            expect(app.injector.namespace).to.be.equal('');
-            expect(app.level1.injector.namespace).to.be.equal('Composition Level 1');
+            expect(app.injector.namespace).to.be.equal('Composition Level 1');
+            expect(app.level1.injector.namespace).to.be.equal('Composition Level 2');
         });
 
         it('should set namespace as a readonly property', function() {
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createNamespace();
+                    this.injector = rootInjector.createNamespace('namespace');
                 }
             }
 
@@ -383,14 +405,14 @@ describe('Injector container', function (){
             };
 
             expect(setNamespace).to.throw();
-            expect(app.injector.namespace).to.be.equal('');
+            expect(app.injector.namespace).to.be.equal('namespace');
         });
 
         it('should set __parent as a readonly property', function() {
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createNamespace();
+                    this.injector = rootInjector.createNamespace('namespace');
                 }
             }
 
