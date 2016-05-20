@@ -79,15 +79,15 @@ describe('Injector container', function (){
         });
     });
 
-    describe('register', function() {
+    describe('registering and resolving', function() {
 
         it('should not overwrite an already registered service', function() {
 
             const injector = new Injector();
 
-            injector.register('TestClass', TestClass);
+            injector.factory('TestClass', TestClass);
             try {
-                injector.register('TestClass', TestClass2);
+                injector.factory('TestClass', TestClass2);
             }
             catch(e) {
                 expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
@@ -97,36 +97,33 @@ describe('Injector container', function (){
         it('should throw an Error if the dependency to be registered is already registered', function() {
 
             const injector = new Injector();
-            injector.register('SupaDupaTestClass', TestClass);
+            injector.factory('SupaDupaTestClass', TestClass);
 
             const testFunc = function() {
-                injector.register('SupaDupaTestClass', TestClass2);
+                injector.function('SupaDupaTestClass', TestClass2);
             };
 
-            expect(testFunc).to.throw(Error, 'Dependency is already registered: SupaDupaTestClass -> TestClass');
+            expect(testFunc).to.throw(Error, 'Dependency is already registered: SupaDupaTestClass');
         });
-    });
 
-    describe('resolve', function() {
+        it('should throw an Error if the dependency to be resolved is not registered', function() {
 
-        describe('a service (as factory)', function () {
+            const injector = new Injector();
 
-            it('should throw an Error if the dependency to be resolved is not registered', function() {
+            const testFunc = function() {
+                injector.resolve('test');
+            };
 
-                const injector = new Injector();
+            expect(testFunc).to.throw(Error, 'Dependency not found: test');
+        });
 
-                const testFunc = function() {
-                    injector.resolve('test');
-                };
+        describe('an instance (as factory)', function () {
 
-                expect(testFunc).to.throw(Error, 'Dependency not found: test');
-            });
-
-            it('should resolve the registered service', function() {
+            it('should resolve by creating a new instance of given function', function() {
 
                 const injector = new Injector();
 
-                injector.register('TestClass', TestClass);
+                injector.factory('TestClass', TestClass);
 
                 expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
             });
@@ -140,7 +137,7 @@ describe('Injector container', function (){
                     },
                     injector = new Injector();
 
-                injector.register('TestClass', TestClass);
+                injector.factory('TestClass', TestClass);
 
                 const instance = injector.resolve('TestClass', expectedStr, expectedFunc, expectedObj);
                 expect(instance.str).to.be.equal(expectedStr);
@@ -149,18 +146,46 @@ describe('Injector container', function (){
             });
         });
 
-        describe('an instance (as singleton)', function () {
+        describe('a function (as function)', function () {
+
+            it('should resolve by simply invoking given function', function() {
+
+                const testFunction = sinon.spy();
+                const injector = new Injector();
+
+                injector.function('TestFunction', testFunction);
+                injector.resolve('TestFunction', 1, 2, 3);
+
+                expect(testFunction).to.have.been.called;
+            });
+
+            it('should resolve by simply invoking given function with given parameters', function() {
+
+                const testFunction = function (a, b, c) {
+                    return a + b + c;
+                };
+                const injector = new Injector();
+
+                injector.function('TestFunction', testFunction);
+                const sum = injector.resolve('TestFunction', 1, 2, 3);
+
+                expect(sum).to.be.equal(6);
+            });
+        });
+
+        describe('an instance (as static)', function () {
 
             it('should resolve the registered instance', function () {
                 const Cache = {cache: 'whatever'},
                     injector = new Injector();
 
-                injector.register('Cache', Cache);
+                injector.static('Cache', Cache);
 
                 expect(injector.resolve('Cache')).to.be.equal(Cache);
             });
         });
     });
+
 
     describe('injector injection', function () {
 
@@ -175,8 +200,8 @@ describe('Injector container', function (){
                 }
 
                 const injector = new Injector();
-                injector.register('TestClass', TestClass);
-                injector.register('App', App);
+                injector.factory('TestClass', TestClass);
+                injector.factory('App', App);
 
                 const start = function() {
                     injector.resolve('App');
@@ -194,7 +219,7 @@ describe('Injector container', function (){
                 injector = new Injector({
                     injectMethod: constructorAppender
                 });
-                injector.register('TestClass', TestClass);
+                injector.factory('TestClass', TestClass);
             });
 
             it('should inject the injector to the end of constructor\'s parameter list', function() {
@@ -206,7 +231,7 @@ describe('Injector container', function (){
                     }
                 }
 
-                injector.register('App', App);
+                injector.factory('App', App);
 
                 const start = function() {
                     injector.resolve('App', 'first param', 'second param');
@@ -224,7 +249,7 @@ describe('Injector container', function (){
                     }
                 }
 
-                injector.register('App', App);
+                injector.factory('App', App);
 
                 const start = function() {
                     injector.resolve('App');
@@ -258,9 +283,9 @@ describe('Injector container', function (){
                 class TestClass {}
                 class TestClass2 {}
 
-                injector.register('App', App);
-                injector.register('TestClass', TestClass);
-                injector.register('TestClass2', TestClass2);
+                injector.factory('App', App);
+                injector.factory('TestClass', TestClass);
+                injector.factory('TestClass2', TestClass2);
 
                 const start = function() {
                     appInstance = injector.resolve('App');
@@ -308,16 +333,16 @@ describe('Injector container', function (){
             class Level1 {
                 constructor(rootInjector) {
                     const injector = rootInjector.createChild('level2');
-                    injector.register('TestClass', TestClass2);
+                    injector.factory('TestClass', TestClass2);
 
                     this.test = injector.resolve('TestClass');
                 }
             }
 
             const injector = new Injector();
-            injector.register('App', App);
-            injector.register('Level1', Level1);
-            injector.register('TestClass', TestClass);
+            injector.factory('App', App);
+            injector.factory('Level1', Level1);
+            injector.factory('TestClass', TestClass);
 
             const app = injector.resolve('App');
 
@@ -335,7 +360,7 @@ describe('Injector container', function (){
             class Level1 {
                 constructor(rootInjector) {
                     const injector = rootInjector.createChild('whatever');
-                    injector.register('ServiceFromLevel1', TestClass2);
+                    injector.factory('ServiceFromLevel1', TestClass2);
                     this.level2 = injector.resolve('Level2');
                 }
             }
@@ -349,10 +374,10 @@ describe('Injector container', function (){
             }
 
             const injector = new Injector();
-            injector.register('App', App);
-            injector.register('Level1', Level1);
-            injector.register('Level2', Level2);
-            injector.register('TestClass', TestClass);
+            injector.factory('App', App);
+            injector.factory('Level1', Level1);
+            injector.factory('Level2', Level2);
+            injector.factory('TestClass', TestClass);
 
             const app = injector.resolve('App');
 
@@ -376,9 +401,9 @@ describe('Injector container', function (){
             }
 
             const injector = new Injector();
-            injector.register('App', App);
-            injector.register('Level1', Level1);
-            injector.register('TestClass', TestClass);
+            injector.factory('App', App);
+            injector.factory('Level1', Level1);
+            injector.factory('TestClass', TestClass);
 
             const app = injector.resolve('App');
 
@@ -396,7 +421,7 @@ describe('Injector container', function (){
             }
 
             const injector = new Injector();
-            injector.register('App', App);
+            injector.factory('App', App);
 
             const app = injector.resolve('App');
 
@@ -417,7 +442,7 @@ describe('Injector container', function (){
             }
 
             const injector = new Injector();
-            injector.register('App', App);
+            injector.factory('App', App);
 
             const app = injector.resolve('App');
 
@@ -433,7 +458,7 @@ describe('Injector container', function (){
 
         it('should reset the container\'s registered providers', function () {
             const injector = new Injector();
-            injector.register('test', TestClass);
+            injector.factory('test', TestClass);
             const testFunc = function () { injector.resolve('test'); };
 
             injector.reset();
