@@ -46,14 +46,14 @@ describe('Injector container', function (){
 
         describe('parent', function () {
 
-            it('should create injector with null __parent by default', function () {
+            it('should create injector with null parent by default', function () {
 
                 const injector = new Injector();
 
-                expect(injector.__parent).to.be.null;
+                expect(injector.parent).to.be.null;
             });
 
-            it('should create injector with passed parameter as __parent if given', function () {
+            it('should create injector with passed parameter as parent if given', function () {
 
                 const parentContainer = {},
                     injector = new Injector({
@@ -61,20 +61,20 @@ describe('Injector container', function (){
                         parent: parentContainer
                     });
 
-                expect(injector.__parent).to.be.equal(parentContainer);
+                expect(injector.parent).to.be.equal(parentContainer);
             });
 
-            it('should create the __parent property as a readonly property', function () {
+            it('should create the parent property as a readonly property', function () {
                 const parentContainer = {},
                     injector = new Injector({
                         scope: 'Planet Namek',
                         parent: parentContainer
                     });
 
-                function setParent() { injector.__parent = {}; }
+                function setParent() { injector.parent = {}; }
 
                 expect(setParent).to.throw();
-                expect(injector.__parent).to.be.equal(parentContainer);
+                expect(injector.parent).to.be.equal(parentContainer);
             });
         });
     });
@@ -217,7 +217,7 @@ describe('Injector container', function (){
 
             beforeEach(function() {
                 injector = new Injector({
-                    injectMethod: constructorAppender
+                    injectionStrategy: constructorAppender
                 });
                 injector.factory('TestClass', TestClass);
             });
@@ -265,7 +265,7 @@ describe('Injector container', function (){
 
             beforeEach(function() {
                 injector = new Injector({
-                    injectMethod: prototypePoisoner
+                    injectionStrategy: prototypePoisoner
                 });
             });
 
@@ -433,7 +433,7 @@ describe('Injector container', function (){
             expect(app.injector.scope).to.be.equal('original');
         });
 
-        it('should set __parent as a readonly property', function() {
+        it('should set parent as a readonly property', function() {
 
             class App {
                 constructor(rootInjector) {
@@ -447,7 +447,7 @@ describe('Injector container', function (){
             const app = injector.resolve('App');
 
             const setParent = function() {
-                app.injector.__parent = {}
+                app.injector.parent = {}
             };
 
             expect(setParent).to.throw();
