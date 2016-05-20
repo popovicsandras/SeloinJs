@@ -5,7 +5,7 @@ import { default as getPoisonedPrototypeInstance } from '../../../lib/injection-
 describe('Prototype poisoner', function () {
 
     const injector = { resolve: function() {} };
-    var appInstance;
+    let appInstance;
 
     describe('[Function declarations]', function () {
 

@@ -18,46 +18,46 @@ describe('Injector container', function (){
 
     describe('constructor', function () {
 
-        describe('namespace', function () {
+        describe('scope', function () {
 
-            it('should create injector with "Composition Root" namespace by default', function () {
+            it('should create injector with "root" scope (name) by default', function () {
 
                 const injector = new Injector();
 
-                expect(injector.namespace).to.be.equal('Composition Root');
+                expect(injector.scope).to.be.equal('root');
             });
 
-            it('should create injector with passed parameter as namespace if given', function () {
+            it('should create injector with passed parameter as scope (name) if given', function () {
 
-                const injector = new Injector({name: 'Planet Namek'});
+                const injector = new Injector({scope: 'Planet Namek'});
 
-                expect(injector.namespace).to.be.equal('Planet Namek');
+                expect(injector.scope).to.be.equal('Planet Namek');
             });
 
-            it('should create the namespace property as a readonly property', function () {
+            it('should create the scope property as a readonly property', function () {
                 const injector = new Injector();
 
-                function setNamespace() { injector.namespace = 'Modified'; }
+                function setScope() { injector.scope = 'Modified'; }
 
-                expect(setNamespace).to.throw();
-                expect(injector.namespace).to.be.equal('Composition Root');
+                expect(setScope).to.throw();
+                expect(injector.scope).to.be.equal('root');
             });
         });
 
         describe('parent', function () {
 
-            it('should create injector with null namespace by default', function () {
+            it('should create injector with null __parent by default', function () {
 
                 const injector = new Injector();
 
                 expect(injector.__parent).to.be.null;
             });
 
-            it('should create injector with passed parameter as parent if given', function () {
+            it('should create injector with passed parameter as __parent if given', function () {
 
                 const parentContainer = {},
                     injector = new Injector({
-                        name: 'Planet Namek',
+                        scope: 'Planet Namek',
                         parent: parentContainer
                     });
 
@@ -67,7 +67,7 @@ describe('Injector container', function (){
             it('should create the __parent property as a readonly property', function () {
                 const parentContainer = {},
                     injector = new Injector({
-                        name: 'Planet Namek',
+                        scope: 'Planet Namek',
                         parent: parentContainer
                     });
 
@@ -188,7 +188,7 @@ describe('Injector container', function (){
 
         describe('Constructor parameter appending', function () {
 
-            var injector;
+            let injector;
 
             beforeEach(function() {
                 injector = new Injector({
@@ -236,7 +236,7 @@ describe('Injector container', function (){
 
         describe('Prototype poisoning', function () {
 
-            var injector;
+            let injector;
 
             beforeEach(function() {
                 injector = new Injector({
@@ -246,7 +246,7 @@ describe('Injector container', function (){
 
             it('should work properly in case of extended classes too', function() {
 
-                var appInstance = null;
+                let appInstance = null;
                 class Base {}
                 class App extends Base {
                     constructor() {
@@ -273,28 +273,28 @@ describe('Injector container', function (){
         });
     });
 
-    describe('createNamespace', function() {
+    describe('createChild', function() {
 
-        it('should throw an error if createNamespace has no namespace', function() {
+        it('should throw an error if createChild has no scope', function() {
 
             const injector = new Injector();
 
-            const createNamespace = function() {
-                injector.createNamespace();
+            const createChild = function() {
+                injector.createChild();
             };
 
-            expect(createNamespace).to.throw(`Namespace can't be empty`);
+            expect(createChild).to.throw(`Scope can't be empty`);
         });
 
-        it('should throw an error if createNamespace is empty string', function() {
+        it('should throw an error if createChild is empty string', function() {
 
             const injector = new Injector();
 
-            const createNamespace = function() {
-                injector.createNamespace('');
+            const createChild = function() {
+                injector.createChild('');
             };
 
-            expect(createNamespace).to.throw(`Namespace can't be empty`);
+            expect(createChild).to.throw(`Scope can't be empty`);
         });
 
         it('should create a new level in injector chain', function() {
@@ -307,7 +307,7 @@ describe('Injector container', function (){
 
             class Level1 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createNamespace('Level2');
+                    const injector = rootInjector.createChild('level2');
                     injector.register('TestClass', TestClass2);
 
                     this.test = injector.resolve('TestClass');
@@ -334,7 +334,7 @@ describe('Injector container', function (){
 
             class Level1 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createNamespace('whatever');
+                    const injector = rootInjector.createChild('whatever');
                     injector.register('ServiceFromLevel1', TestClass2);
                     this.level2 = injector.resolve('Level2');
                 }
@@ -342,7 +342,7 @@ describe('Injector container', function (){
 
             class Level2 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createNamespace('whatever2');
+                    const injector = rootInjector.createChild('whatever2');
                     this.test = injector.resolve('TestClass');
                     this.test2 = injector.resolve('ServiceFromLevel1');
                 }
@@ -360,18 +360,18 @@ describe('Injector container', function (){
             expect(app.level1.level2.test2).to.be.instanceOf(TestClass2);
         });
 
-        it('should set namespace if specified in parameter', function() {
+        it('should set scope if specified in parameter', function() {
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createNamespace('Composition Level 1');
+                    this.injector = rootInjector.createChild('level1');
                     this.level1 = this.injector.resolve('Level1');
                 }
             }
 
             class Level1 {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createNamespace('Composition Level 2');
+                    this.injector = rootInjector.createChild('level2');
                 }
             }
 
@@ -382,16 +382,16 @@ describe('Injector container', function (){
 
             const app = injector.resolve('App');
 
-            expect(injector.namespace).to.be.equal('Composition Root');
-            expect(app.injector.namespace).to.be.equal('Composition Level 1');
-            expect(app.level1.injector.namespace).to.be.equal('Composition Level 2');
+            expect(injector.scope).to.be.equal('root');
+            expect(app.injector.scope).to.be.equal('level1');
+            expect(app.level1.injector.scope).to.be.equal('level2');
         });
 
-        it('should set namespace as a readonly property', function() {
+        it('should set scope as a readonly property', function() {
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createNamespace('namespace');
+                    this.injector = rootInjector.createChild('original');
                 }
             }
 
@@ -400,19 +400,19 @@ describe('Injector container', function (){
 
             const app = injector.resolve('App');
 
-            const setNamespace = function() {
-                app.injector.namespace = 'Modified'
+            const setScope = function() {
+                app.injector.scope = 'modified'
             };
 
-            expect(setNamespace).to.throw();
-            expect(app.injector.namespace).to.be.equal('namespace');
+            expect(setScope).to.throw();
+            expect(app.injector.scope).to.be.equal('original');
         });
 
         it('should set __parent as a readonly property', function() {
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createNamespace('namespace');
+                    this.injector = rootInjector.createChild('scope1');
                 }
             }
 
@@ -444,7 +444,7 @@ describe('Injector container', function (){
 
     describe('load', function () {
 
-        var jsonLoaderMock;
+        let jsonLoaderMock;
 
         beforeEach(function() {
             jsonLoaderMock = {
@@ -478,7 +478,7 @@ describe('Injector container', function (){
             const instance = injector.resolve('Factory', 'Kakarot'),
                 singleton = injector.resolve('Singleton');
 
-            expect(instance.name).to.be.equal('Factory: Kakarot');
+            expect(instance.scope).to.be.equal('Factory: Kakarot');
             expect(singleton.id).to.be.equal('Singleton');
         });
     });

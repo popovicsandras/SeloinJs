@@ -8,7 +8,6 @@
     "start": "webpack-dev-server -d --config webpack.dev-server.config.js",
     "build:dev": "webpack -d --config webpack-dev-server.config.js",
     "build": "webpack -p --config webpack.build.config.js",
-    "pretest": "eslint lib/**.js test/**.js",
     "test": "mocha-webpack"
   },
   "author": "Andras Popovics",
