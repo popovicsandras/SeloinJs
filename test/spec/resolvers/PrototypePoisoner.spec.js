@@ -130,6 +130,22 @@ describe('PrototypePoisoner', function () {
 
     describe('function', function () {
 
+        const testFunction = function(a, b) {
+            this.injector.resolve('Whatever');
+            return a + b;
+        };
+
+        it('should make possible to access the injector from the function\'s context', function() {
+
+            let result = null;
+            const start = function() {
+                result = prototypePoisoner.function(injector, testFunction, 3, 4);
+            };
+
+            expect(start).to.not.throw();
+            expect(result).to.be.equal(7);
+        });
+
     });
 
     describe('static', function () {
