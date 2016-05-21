@@ -1,8 +1,8 @@
 'use strict';
 
-import Injector from '../../lib/Injector.js';
-import constructorAppender from '../../lib/injection-strategies/ConstructorAppender.js';
-import prototypePoisoner from '../../lib/injection-strategies/PrototypePoisoner.js';
+import Injector from '../../lib/Injector';
+import ParamListAppender from '../../lib/resolvers/ParamListAppender';
+import prototypePoisoner from '../../lib/resolvers/PrototypePoisoner';
 
 class TestClass {
     constructor (injector, str, func, obj) {
@@ -161,7 +161,7 @@ describe('Injector container', function (){
 
             it('should resolve by simply invoking given function with given parameters', function() {
 
-                const testFunction = function (a, b, c) {
+                const testFunction = function (injector, a, b, c) {
                     return a + b + c;
                 };
                 const injector = new Injector();
@@ -186,7 +186,6 @@ describe('Injector container', function (){
         });
     });
 
-
     describe('injector injection', function () {
 
         describe('Constructor parameter prepending', function () {
@@ -194,7 +193,7 @@ describe('Injector container', function (){
             it('should be used by default', function() {
 
                 class App {
-                    constructor(injector) {
+                    constructor(injector, param1, param2) {
                         injector.resolve('TestClass');
                     }
                 }
@@ -204,7 +203,7 @@ describe('Injector container', function (){
                 injector.factory('App', App);
 
                 const start = function() {
-                    injector.resolve('App');
+                    injector.resolve('App', 'param1', 'param2');
                 };
 
                 expect(start).to.not.throw();
@@ -217,7 +216,7 @@ describe('Injector container', function (){
 
             beforeEach(function() {
                 injector = new Injector({
-                    injectionStrategy: constructorAppender
+                    resolver: new ParamListAppender()
                 });
                 injector.factory('TestClass', TestClass);
             });
@@ -265,7 +264,7 @@ describe('Injector container', function (){
 
             beforeEach(function() {
                 injector = new Injector({
-                    injectionStrategy: prototypePoisoner
+                    resolver: prototypePoisoner
                 });
             });
 

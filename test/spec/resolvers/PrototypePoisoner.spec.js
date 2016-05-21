@@ -1,6 +1,6 @@
 'use strict';
 
-import { default as getPoisonedPrototypeInstance } from '../../../lib/injection-strategies/PrototypePoisoner.js';
+import { default as getPoisonedPrototypeInstance } from '../../../lib/resolvers/PrototypePoisoner.js';
 
 describe('Prototype poisoner', function () {
 
