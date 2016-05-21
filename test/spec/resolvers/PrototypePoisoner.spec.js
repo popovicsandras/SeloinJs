@@ -1,123 +1,146 @@
 'use strict';
 
-import { default as getPoisonedPrototypeInstance } from '../../../lib/resolvers/PrototypePoisoner.js';
+import PrototypePoisoner from '../../../lib/resolvers/PrototypePoisoner.js';
 
-describe('Prototype poisoner', function () {
+describe('PrototypePoisoner', function () {
 
     const injector = { resolve: function() {} };
-    let appInstance;
+    let prototypePoisoner,
+        appInstance;
 
-    describe('[Function declarations]', function () {
-
-        const AppFuncDecl = function(param1, param2) {
-            this.param1 = param1;
-            this.param2 = param2;
-            this.injector.resolve('TestClass');
-        };
-
-        AppFuncDecl.prototype = {
-            testMethod: function() {
-                this.injector.resolve();
-            }
-        };
-
-        it('should create an instance of given class with the passed parameters', function() {
-
-            appInstance = getPoisonedPrototypeInstance(injector, AppFuncDecl, 'param1', 'param2');
-
-            expect(appInstance.param1).to.be.equal('param1');
-            expect(appInstance.param2).to.be.equal('param2');
-        });
-
-        it('should make possible to access the injector from the constructor', function() {
-
-            const start = function() {
-                appInstance = getPoisonedPrototypeInstance(injector, AppFuncDecl);
-            };
-
-            expect(start).to.not.throw();
-            expect(appInstance.injector).to.be.equal(injector);
-        });
-
-        it('should left the prototype chain unchanged after the constructor invoked', function() {
-
-            const start = function() {
-                appInstance = getPoisonedPrototypeInstance(injector, AppFuncDecl);
-            };
-
-            expect(start).to.not.throw();
-            expect(AppFuncDecl.prototype.injector).to.be.undefined;
-        });
-
-        it('should have the injector in the created instance', function() {
-
-            appInstance = getPoisonedPrototypeInstance(injector, AppFuncDecl);
-
-            const testMethod = function() {
-                appInstance.testMethod();
-            };
-
-            expect(testMethod).to.not.throw();
-            expect(AppFuncDecl.prototype.injector).to.be.undefined;
-            expect(appInstance.injector).to.be.equal(injector);
-        });
+    beforeEach(function() {
+        prototypePoisoner = new PrototypePoisoner();
     });
 
-    describe('[Class declarations]', function () {
+    describe('factory', function () {
 
-        class AppClassDecl {
-            constructor(param1, param2) {
+        describe('Function declarations', function () {
+
+            const AppFuncDecl = function(param1, param2) {
                 this.param1 = param1;
                 this.param2 = param2;
                 this.injector.resolve('TestClass');
+            };
+            AppFuncDecl.prototype = {
+                testMethod: function() {
+                    this.injector.resolve();
+                }
+            };
+
+            it('should create an instance of given class with the passed parameters', function() {
+
+                appInstance = prototypePoisoner.factory(injector, AppFuncDecl, 'param1', 'param2');
+
+                expect(appInstance.param1).to.be.equal('param1');
+                expect(appInstance.param2).to.be.equal('param2');
+            });
+
+            it('should make possible to access the injector from the constructor', function() {
+
+                const start = function() {
+                    appInstance = prototypePoisoner.factory(injector, AppFuncDecl);
+                };
+
+                expect(start).to.not.throw();
+                expect(appInstance.injector).to.be.equal(injector);
+            });
+
+            it('should left the prototype chain unchanged after the constructor invoked', function() {
+
+                const start = function() {
+                    appInstance = prototypePoisoner.factory(injector, AppFuncDecl);
+                };
+
+                expect(start).to.not.throw();
+                expect(AppFuncDecl.prototype.injector).to.be.undefined;
+            });
+
+            it('should have the injector in the created instance', function() {
+
+                appInstance = prototypePoisoner.factory(injector, AppFuncDecl);
+
+                const testMethod = function() {
+                    appInstance.testMethod();
+                };
+
+                expect(testMethod).to.not.throw();
+                expect(AppFuncDecl.prototype.injector).to.be.undefined;
+                expect(appInstance.injector).to.be.equal(injector);
+            });
+        });
+
+        describe('Class declarations', function () {
+
+            class AppClassDecl {
+                constructor(param1, param2) {
+                    this.param1 = param1;
+                    this.param2 = param2;
+                    this.injector.resolve('TestClass');
+                }
+
+                testMethod() {
+                    this.injector.resolve();
+                }
             }
 
-            testMethod() {
-                this.injector.resolve();
-            }
-        }
+            class Extended extends AppClassDecl {}
 
-        class Extended extends AppClassDecl {}
+            it('should create an instance of given class with the passed parameters', function() {
 
-        it('should create an instance of given class with the passed parameters', function() {
+                appInstance = prototypePoisoner.factory(injector, AppClassDecl, 'param1', 'param2');
 
-            appInstance = getPoisonedPrototypeInstance(injector, AppClassDecl, 'param1', 'param2');
+                expect(appInstance.param1).to.be.equal('param1');
+                expect(appInstance.param2).to.be.equal('param2');
+            });
 
-            expect(appInstance.param1).to.be.equal('param1');
-            expect(appInstance.param2).to.be.equal('param2');
+            it('should make possible to access the injector from the constructor', function() {
+
+                const start = function() {
+                    appInstance = prototypePoisoner.factory(injector, AppClassDecl);
+                };
+
+                expect(start).to.not.throw();
+                expect(appInstance.injector).to.be.equal(injector);
+            });
+
+            it('should left the prototype chain unchanged after the constructor invoked', function() {
+
+                const start = function() {
+                    appInstance = prototypePoisoner.factory(injector, AppClassDecl);
+                };
+
+                expect(start).to.not.throw();
+                expect(AppClassDecl.prototype.injector).to.be.undefined;
+            });
+
+            it('should have the injector in the created instance', function() {
+
+                appInstance = prototypePoisoner.factory(injector, Extended);
+
+                const testMethod = function() {
+                    appInstance.testMethod();
+                };
+
+                expect(testMethod).to.not.throw();
+                expect(Extended.prototype.injector).to.be.undefined;
+                expect(appInstance.injector).to.be.equal(injector);
+            });
         });
+    });
 
-        it('should make possible to access the injector from the constructor', function() {
+    describe('function', function () {
 
-            const start = function() {
-                appInstance = getPoisonedPrototypeInstance(injector, AppClassDecl);
-            };
+    });
 
-            expect(start).to.not.throw();
-            expect(appInstance.injector).to.be.equal(injector);
-        });
+    describe('static', function () {
 
-        it('should left the prototype chain unchanged after the constructor invoked', function() {
+        it('should simply return the instance object', function() {
 
-            const start = function() {
-                appInstance = getPoisonedPrototypeInstance(injector, AppClassDecl);
-            };
+            const testInstance = {};
 
-            expect(start).to.not.throw();
-            expect(AppClassDecl.prototype.injector).to.be.undefined;
-        });
+            let result = prototypePoisoner.static(injector, testInstance);
 
-        it('should have the injector in the created instance', function() {
-
-            appInstance = getPoisonedPrototypeInstance(injector, Extended);
-
-            const testMethod = function() {
-                appInstance.testMethod();
-            };
-
-            expect(testMethod).to.not.throw();
-            expect(Extended.prototype.injector).to.be.undefined;
-            expect(appInstance.injector).to.be.equal(injector);
+            expect(result).to.be.equal(testInstance);
         });
     });
 });

@@ -2,7 +2,7 @@
 
 import Injector from '../../lib/Injector';
 import ParamListAppender from '../../lib/resolvers/ParamListAppender';
-import prototypePoisoner from '../../lib/resolvers/PrototypePoisoner';
+import PrototypePoisoner from '../../lib/resolvers/PrototypePoisoner';
 
 class TestClass {
     constructor (injector, str, func, obj) {
@@ -186,7 +186,7 @@ describe('Injector container', function (){
         });
     });
 
-    describe('injector injection', function () {
+    describe('Resolver selection', function () {
 
         describe('Constructor parameter prepending', function () {
 
@@ -264,7 +264,7 @@ describe('Injector container', function (){
 
             beforeEach(function() {
                 injector = new Injector({
-                    resolver: prototypePoisoner
+                    resolver: new PrototypePoisoner()
                 });
             });
 
