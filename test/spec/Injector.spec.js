@@ -328,26 +328,74 @@ describe('Injector container', function (){
 
     describe('createChild', function() {
 
-        it('should throw an error if createChild has no scope', function() {
+        it('should throw an error if createChild has no scope name', function() {
 
             const injector = new Injector();
 
             const createChild = function() {
+                injector.createChild({});
+            };
+            const createChildSimple = function() {
                 injector.createChild();
             };
 
-            expect(createChild).to.throw(`Scope can't be empty`);
+
+            expect(createChild).to.throw(`Scope name can't be empty`);
+            expect(createChildSimple).to.throw(`Scope name can't be empty`);
         });
 
-        it('should throw an error if createChild is empty string', function() {
+        it('should throw an error if createChild\'s scope name is empty string', function() {
 
             const injector = new Injector();
 
             const createChild = function() {
+                injector.createChild({scope: ''});
+            };
+            const createChildSimple = function() {
                 injector.createChild('');
             };
 
-            expect(createChild).to.throw(`Scope can't be empty`);
+            expect(createChild).to.throw(`Scope name can't be empty`);
+            expect(createChildSimple).to.throw(`Scope name can't be empty`);
+        });
+
+        it('should set the scope name of child scope to the given parameter', function () {
+
+            let childScopeFromObject,
+                childScopeSimple;
+
+            const injector = new Injector();
+
+            childScopeFromObject = injector.createChild({scope: 'scope-name-from-options-object'});
+            childScopeSimple = injector.createChild('scope-name-from-string');
+
+            expect(childScopeFromObject.scope).to.be.equal('scope-name-from-options-object');
+            expect(childScopeSimple.scope).to.be.equal('scope-name-from-string');
+        });
+
+        it('should use the parent\'s resolver by default', function () {
+
+            const injector = new Injector();
+
+            const childScopeSimple = injector.createChild({
+                scope: 'scope-name-from-string'
+            });
+
+            expect(childScopeSimple.resolver).to.be.equal(injector.resolver);
+        });
+
+        it('should use the passed resolver for the new child scope', function () {
+
+            const injector = new Injector();
+            const resolver = new PrototypePoisoner();
+
+            const childScopeFromObject = injector.createChild({
+                scope: 'scope-name-from-options-object',
+                resolver: resolver
+            });
+
+            expect(childScopeFromObject.resolver).to.be.not.equal(injector.resolver);
+            expect(childScopeFromObject.resolver).to.be.equal(resolver);
         });
 
         it('should create a new level in injector chain', function() {
