@@ -206,6 +206,19 @@ describe('Injector container', function (){
                 expect(childScope.resolve('config:child-scope')).to.be.equal(configObject);
             });
         });
+
+        describe('a config object on a named scope (as configScope)', function () {
+
+            it('should resolve the registered named config instance', function () {
+
+                const configObject = {},
+                    injector = new Injector();
+
+                injector.configScope('my-supa-dupa-scope', configObject);
+
+                expect(injector.resolve('config:my-supa-dupa-scope')).to.be.equal(configObject);
+            });
+        });
     });
 
     describe('Resolver selection (with some example usage)', function () {
@@ -479,47 +492,6 @@ describe('Injector container', function (){
             injector.reset();
 
             expect(testFunc).to.throw(Error, 'Dependency not found: test');
-        });
-    });
-
-    describe('load', function () {
-
-        let jsonLoaderMock;
-
-        beforeEach(function() {
-            jsonLoaderMock = {
-                load: function(filename, registrator) {
-                    registrator('Factory', function(injector, name) { this.name = `Factory: ${name}`; });
-                    registrator('Singleton', { id: 'Singleton' });
-                }
-            };
-
-            sinon.spy(jsonLoaderMock, 'load');
-        });
-
-        afterEach(function() {
-            jsonLoaderMock.load.restore();
-        });
-
-        it.skip('should load the appropriate config loader\'s load method', function () {
-
-            const injector = new Injector({loader: jsonLoaderMock});
-
-            injector.load('app-di.json');
-
-            expect(jsonLoaderMock.load).to.have.been.calledWith('app-di.json');
-        });
-
-        it.skip('should register all the services returned by the loader', function () {
-
-            const injector = new Injector({loader: jsonLoaderMock});
-            injector.load('app-di.json');
-
-            const instance = injector.resolve('Factory', 'Kakarot'),
-                singleton = injector.resolve('Singleton');
-
-            expect(instance.scope).to.be.equal('Factory: Kakarot');
-            expect(singleton.id).to.be.equal('Singleton');
         });
     });
 
