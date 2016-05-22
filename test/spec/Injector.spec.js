@@ -187,13 +187,23 @@ describe('Injector container', function (){
 
         describe('a config object (as config)', function () {
 
-            it('should resolve the registered instance', function () {
+            it('should resolve the registered instance on root', function () {
                 const configObject = {},
                     injector = new Injector();
 
-                injector.config('scope-name', configObject);
+                injector.config(configObject);
 
-                expect(injector.resolve('conf:scope-name')).to.be.equal(configObject);
+                expect(injector.resolve('conf:root')).to.be.equal(configObject);
+            });
+
+            it('should resolve the registered instance on child scope', function () {
+                const configObject = {},
+                    injector = new Injector();
+
+                const childScope = injector.createChild('child-scope');
+                childScope.config(configObject);
+
+                expect(childScope.resolve('conf:child-scope')).to.be.equal(configObject);
             });
         });
     });
@@ -510,6 +520,78 @@ describe('Injector container', function (){
 
             expect(instance.scope).to.be.equal('Factory: Kakarot');
             expect(singleton.id).to.be.equal('Singleton');
+        });
+    });
+
+    describe('initScope', function () {
+
+        const configObject = {
+            factory: {
+                'TestClass': TestClass,
+                'TestClass2': TestClass2
+            },
+            function: {
+                'testFn': sinon.spy(),
+                'testFn2': sinon.spy()
+            },
+            static: {
+                'obj1': {foo: 'bar'},
+                'obj2': {foo: 'baz'}
+
+            }
+        };
+
+        it('should register the factories of configObject', function () {
+
+            const injector = new Injector();
+            injector.config(configObject);
+
+            injector.initScope();
+
+            const test = injector.resolve('TestClass'),
+                test2 = injector.resolve('TestClass2');
+
+            expect(test).to.be.an.instanceOf(TestClass);
+            expect(test2).to.be.an.instanceOf(TestClass2);
+        });
+
+        it('should register the functions of configObject', function () {
+
+            const injector = new Injector();
+            injector.config(configObject);
+
+            injector.initScope();
+
+            injector.resolve('testFn');
+            injector.resolve('testFn2');
+
+            expect(configObject.function.testFn).to.have.been.called;
+            expect(configObject.function.testFn2).to.have.been.called;
+        });
+
+        it('should register the statics of configObject', function () {
+
+            const injector = new Injector();
+            injector.config(configObject);
+
+            injector.initScope();
+
+            const obj1 = injector.resolve('obj1'),
+                obj2 = injector.resolve('obj2');
+
+            expect(obj1).to.be.equal(configObject.static.obj1);
+            expect(obj2).to.be.equal(configObject.static.obj2);
+        });
+
+        // don't init anything if there is no conf:scope resolution
+        // don't init if it is already initialised
+        it.skip('should do nothing if there is no configuration object registered to the current namespace', function () {
+
+            const injector = new Injector();
+
+            injector.initScope();
+
+            expect(injector.dependencies.size).to.be.equal(0);
         });
     });
 });
