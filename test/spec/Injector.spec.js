@@ -221,111 +221,6 @@ describe('Injector container', function (){
         });
     });
 
-    describe('Resolver selection (with some example usage)', function () {
-
-        describe('ParamListPrepender and static resolvation', function () {
-
-            it('should resolve the static instance', function() {
-
-                const testObj = {foo: 'bar'};
-                const injector = new Injector();
-                injector.static('mySupaInstance', testObj);
-
-                const result = injector.resolve('mySupaInstance');
-                expect(result).to.be.equal(testObj);
-            });
-        });
-
-        describe('ParamListPrepender and function resolvation', function () {
-
-            const testFunction = function(injector, str, obj) {
-                return {
-                    injector: injector,
-                    str: str,
-                    obj: obj
-                }
-            };
-
-            it('should resolve the function with injecting the injector as first parameter', function() {
-
-                const dummyStr = 'testString',
-                    dummyObj = {foo: 'bar'};
-
-                const injector = new Injector();
-                injector.function('testFunction', testFunction);
-
-                const result = injector.resolve('testFunction', dummyStr, dummyObj);
-                expect(result.str).to.be.equal(dummyStr);
-                expect(result.obj).to.be.equal(dummyObj);
-            });
-        });
-
-        describe('ParamListAppender and factory resolvation', function () {
-
-            let injector;
-
-            beforeEach(function() {
-                injector = new Injector({
-                    resolver: new ParamListAppender()
-                });
-                injector.factory('TestClass', TestClass);
-            });
-
-            it('should inject the injector to the end of constructor\'s parameter list', function() {
-
-                class App {
-                    constructor() {
-                        const injector = arguments[arguments.length - 1];
-                        this.test = injector.resolve('TestClass');
-                    }
-                }
-                injector.factory('App', App);
-
-                const app = injector.resolve('App');
-
-                expect(app.test).to.be.an.instanceOf(TestClass);
-            });
-        });
-
-        describe('PrototypePoisoner with overridden name', function () {
-
-            let services;
-
-            beforeEach(function() {
-                services = new Injector({
-                    resolver: new PrototypePoisoner('services')
-                });
-            });
-
-            it('should work properly in case of extended classes too', function() {
-
-                let appInstance = null;
-                class Base {}
-                class App extends Base {
-                    constructor() {
-                        super();
-                        this.services.resolve('TestClass');
-                        this.services.resolve('TestClass2');
-                    }
-                }
-                class TestClass {}
-                class TestClass2 {}
-
-                services.factory('App', App);
-                services.factory('TestClass', TestClass);
-                services.factory('TestClass2', TestClass2);
-
-                const start = function() {
-                    appInstance = services.resolve('App');
-                };
-
-                expect(start).to.not.throw();
-                expect(appInstance.services).to.be.equal(services);
-                expect(App.prototype.services).to.be.undefined;
-            });
-        });
-    });
-
     describe('createChild', function() {
 
         it('should throw an error if createChild has no scope name', function() {
@@ -384,10 +279,10 @@ describe('Injector container', function (){
             expect(childScopeSimple.resolver).to.be.equal(injector.resolver);
         });
 
-        it('should use the passed resolver for the new child scope', function () {
+        it('should set the passed resolver for the new child scope', function () {
 
             const injector = new Injector();
-            const resolver = new PrototypePoisoner();
+            const resolver = new ParamListAppender();
 
             const childScopeFromObject = injector.createChild({
                 scope: 'scope-name-from-options-object',
@@ -396,6 +291,32 @@ describe('Injector container', function (){
 
             expect(childScopeFromObject.resolver).to.be.not.equal(injector.resolver);
             expect(childScopeFromObject.resolver).to.be.equal(resolver);
+        });
+
+        it('should use the passed resolver for the new child scope', function () {
+
+            class TestForOverriddenResolver {
+                constructor(param1, injector) {
+                    injector.resolve('TestClass');
+                    this.param1 = param1;
+                }
+            }
+
+            let test;
+            const injector = new Injector();
+            injector.factory('TestForOverriddenResolver', TestForOverriddenResolver);
+            injector.factory('TestClass', TestClass);
+            const childScopeFromObject = injector.createChild({
+                scope: 'whatever',
+                resolver: new ParamListAppender()
+            });
+
+            function testResolve() {
+                test = childScopeFromObject.resolve('TestForOverriddenResolver', 'param1');
+            }
+
+            expect(testResolve).to.not.throw();
+            expect(test.param1).to.be.equal('param1');
         });
 
         it('should create a new level in injector chain', function() {
@@ -639,59 +560,173 @@ describe('Injector container', function (){
             expect(initScope).to.not.throw();
             expect(injector.dependencies.size).to.be.equal(0);
         });
+    });
 
-        it('should work fine [small integration test, usage example]', function () {
+    describe('Mini integration tests [usage example]', function () {
 
-            class App {
-                constructor(injector) {
-                    const reusableComponentScope = injector.createChild('reusable-component');
-                    this.reusableComponent = reusableComponentScope.resolve('ReusableComponent');
-                }
-            }
+        describe('ParamListPrepender and static resolvation', function () {
 
-            class ReusableComponent {
-                constructor(injector) {
-                    injector.initScope();
-                    this.dependency = injector.resolve('ReusableComponentsDependencyFactory');
-                    this.appWideGlobalInstance = injector.resolve('AppWideGlobalInstance');
-                    injector.resolve('ReusableComponentsDependencyFunction');
-                }
-            }
+            it('should resolve the static instance', function() {
 
-            const reusableComponentConfig = {
-                factory: {
-                    'ReusableComponentsDependencyFactory': TestClass
-                },
-                function: {
-                    ReusableComponentsDependencyFunction: sinon.spy()
-                }
-            };
-            const appConfig = {
-                factory: {
-                    'App': App,
-                    'ReusableComponent': ReusableComponent
-                },
-                static: {
-                    'AppWideGlobalInstance': {}
-                },
-                config: {
-                    'reusable-component': reusableComponentConfig
+                const testObj = {foo: 'bar'};
+                const injector = new Injector();
+                injector.static('mySupaInstance', testObj);
+
+                const result = injector.resolve('mySupaInstance');
+                expect(result).to.be.equal(testObj);
+            });
+        });
+
+        describe('ParamListPrepender and function resolvation', function () {
+
+            const testFunction = function(injector, str, obj) {
+                return {
+                    injector: injector,
+                    str: str,
+                    obj: obj
                 }
             };
 
-            let app;
-            const injector = new Injector();
-            injector.config(appConfig);
-            injector.initScope();
+            it('should resolve the function with injecting the injector as first parameter', function() {
 
-            function start() {
-                app = injector.resolve('App');
-            }
+                const dummyStr = 'testString',
+                    dummyObj = {foo: 'bar'};
 
-            expect(start).to.not.throw();
-            expect(app.reusableComponent.dependency).to.be.an.instanceOf(TestClass);
-            expect(app.reusableComponent.appWideGlobalInstance).to.be.equal(appConfig.static.AppWideGlobalInstance);
-            expect(reusableComponentConfig.function.ReusableComponentsDependencyFunction).to.have.been.called;
+                const injector = new Injector();
+                injector.function('testFunction', testFunction);
+
+                const result = injector.resolve('testFunction', dummyStr, dummyObj);
+                expect(result.str).to.be.equal(dummyStr);
+                expect(result.obj).to.be.equal(dummyObj);
+            });
+        });
+
+        describe('ParamListAppender and factory resolvation', function () {
+
+            let injector;
+
+            beforeEach(function() {
+                injector = new Injector({
+                    resolver: new ParamListAppender()
+                });
+                injector.factory('TestClass', TestClass);
+            });
+
+            it('should inject the injector to the end of constructor\'s parameter list', function() {
+
+                class App {
+                    constructor() {
+                        const injector = arguments[arguments.length - 1];
+                        this.test = injector.resolve('TestClass');
+                    }
+                }
+                injector.factory('App', App);
+
+                const app = injector.resolve('App');
+
+                expect(app.test).to.be.an.instanceOf(TestClass);
+            });
+        });
+
+        describe('PrototypePoisoner with overridden name', function () {
+
+            let services;
+
+            beforeEach(function() {
+                services = new Injector({
+                    resolver: new PrototypePoisoner('services')
+                });
+            });
+
+            it('should work properly in case of extended classes too', function() {
+
+                let appInstance = null;
+                class Base {}
+                class App extends Base {
+                    constructor() {
+                        super();
+                        this.services.resolve('TestClass');
+                        this.services.resolve('TestClass2');
+                    }
+                }
+                class TestClass {}
+                class TestClass2 {}
+
+                services.factory('App', App);
+                services.factory('TestClass', TestClass);
+                services.factory('TestClass2', TestClass2);
+
+                const start = function() {
+                    appInstance = services.resolve('App');
+                };
+
+                expect(start).to.not.throw();
+                expect(appInstance.services).to.be.equal(services);
+                expect(App.prototype.services).to.be.undefined;
+            });
+        });
+
+        describe('creating child scope with overridden resolver', function () {
+
+            it('should work fine', function () {
+
+                class App {
+                    constructor(injector, param1) {
+                        const reusableComponentScope = injector.createChild({
+                            scope: 'reusable-component',
+                            resolver: new ParamListAppender()
+                        });
+                        this.reusableComponent = reusableComponentScope.resolve('ReusableComponent', param1);
+                    }
+                }
+
+                class ReusableComponent {
+                    constructor(param1) {
+                        const injector = arguments[arguments.length-1];
+                        injector.initScope();
+                        this.dependency = injector.resolve('ReusableComponentsDependencyFactory');
+                        this.appWideGlobalInstance = injector.resolve('AppWideGlobalInstance');
+                        this.param1 = param1;
+                        injector.resolve('ReusableComponentsDependencyFunction');
+                    }
+                }
+
+                const reusableComponentConfig = {
+                    factory: {
+                        'ReusableComponentsDependencyFactory': TestClass
+                    },
+                    function: {
+                        ReusableComponentsDependencyFunction: sinon.spy()
+                    }
+                };
+                const appConfig = {
+                    factory: {
+                        'App': App,
+                        'ReusableComponent': ReusableComponent
+                    },
+                    static: {
+                        'AppWideGlobalInstance': {}
+                    },
+                    config: {
+                        'reusable-component': reusableComponentConfig
+                    }
+                };
+
+                let app;
+                const injector = new Injector();
+                injector.config(appConfig);
+                injector.initScope();
+
+                function start() {
+                    app = injector.resolve('App', 'test param');
+                }
+
+                expect(start).to.not.throw();
+                expect(app.reusableComponent.dependency).to.be.an.instanceOf(TestClass);
+                expect(app.reusableComponent.appWideGlobalInstance).to.be.equal(appConfig.static.AppWideGlobalInstance);
+                expect(app.reusableComponent.param1).to.be.equal('test param');
+                expect(reusableComponentConfig.function.ReusableComponentsDependencyFunction).to.have.been.called;
+            });
         });
     });
 });
