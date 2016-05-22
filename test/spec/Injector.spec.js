@@ -186,31 +186,46 @@ describe('Injector container', function (){
         });
     });
 
-    describe('Resolver selection', function () {
+    describe('Resolver selection (with some example usage)', function () {
 
-        describe('Constructor parameter prepending', function () {
+        describe('ParamListPrepender and static resolvation', function () {
 
-            it('should be used by default', function() {
+            it('should resolve the static instance', function() {
 
-                class App {
-                    constructor(injector, param1, param2) {
-                        injector.resolve('TestClass');
-                    }
-                }
-
+                const testObj = {foo: 'bar'};
                 const injector = new Injector();
-                injector.factory('TestClass', TestClass);
-                injector.factory('App', App);
+                injector.static('mySupaInstance', testObj);
 
-                const start = function() {
-                    injector.resolve('App', 'param1', 'param2');
-                };
-
-                expect(start).to.not.throw();
+                const result = injector.resolve('mySupaInstance');
+                expect(result).to.be.equal(testObj);
             });
         });
 
-        describe('Constructor parameter appending', function () {
+        describe('ParamListPrepender and function resolvation', function () {
+
+            const testFunction = function(injector, str, obj) {
+                return {
+                    injector: injector,
+                    str: str,
+                    obj: obj
+                }
+            };
+
+            it('should resolve the function with injecting the injector as first parameter', function() {
+
+                const dummyStr = 'testString',
+                    dummyObj = {foo: 'bar'};
+
+                const injector = new Injector();
+                injector.function('testFunction', testFunction);
+
+                const result = injector.resolve('testFunction', dummyStr, dummyObj);
+                expect(result.str).to.be.equal(dummyStr);
+                expect(result.obj).to.be.equal(dummyObj);
+            });
+        });
+
+        describe('ParamListAppender and factory resolvation', function () {
 
             let injector;
 
@@ -224,47 +239,26 @@ describe('Injector container', function (){
             it('should inject the injector to the end of constructor\'s parameter list', function() {
 
                 class App {
-                    constructor(param1, param2) {
+                    constructor() {
                         const injector = arguments[arguments.length - 1];
-                        injector.resolve('TestClass');
+                        this.test = injector.resolve('TestClass');
                     }
                 }
-
                 injector.factory('App', App);
 
-                const start = function() {
-                    injector.resolve('App', 'first param', 'second param');
-                };
+                const app = injector.resolve('App');
 
-                expect(start).to.not.throw();
-            });
-
-            it('should inject the injector to the end of constructor\'s parameter list even if there are optional parameters', function() {
-
-                class App {
-                    constructor(optional1 = null, optional2 = '') {
-                        const injector = arguments[arguments.length - 1];
-                        injector.resolve('TestClass');
-                    }
-                }
-
-                injector.factory('App', App);
-
-                const start = function() {
-                    injector.resolve('App');
-                };
-
-                expect(start).to.not.throw();
+                expect(app.test).to.be.an.instanceOf(TestClass);
             });
         });
 
-        describe('Prototype poisoning', function () {
+        describe('PrototypePoisoner with overridden name', function () {
 
-            let injector;
+            let services;
 
             beforeEach(function() {
-                injector = new Injector({
-                    resolver: new PrototypePoisoner()
+                services = new Injector({
+                    resolver: new PrototypePoisoner('services')
                 });
             });
 
@@ -275,24 +269,24 @@ describe('Injector container', function (){
                 class App extends Base {
                     constructor() {
                         super();
-                        this.injector.resolve('TestClass');
-                        this.injector.resolve('TestClass2');
+                        this.services.resolve('TestClass');
+                        this.services.resolve('TestClass2');
                     }
                 }
                 class TestClass {}
                 class TestClass2 {}
 
-                injector.factory('App', App);
-                injector.factory('TestClass', TestClass);
-                injector.factory('TestClass2', TestClass2);
+                services.factory('App', App);
+                services.factory('TestClass', TestClass);
+                services.factory('TestClass2', TestClass2);
 
                 const start = function() {
-                    appInstance = injector.resolve('App');
+                    appInstance = services.resolve('App');
                 };
 
                 expect(start).to.not.throw();
-                expect(appInstance.injector).to.be.equal(injector);
-                expect(App.prototype.injector).to.be.undefined;
+                expect(appInstance.services).to.be.equal(services);
+                expect(App.prototype.services).to.be.undefined;
             });
         });
     });
