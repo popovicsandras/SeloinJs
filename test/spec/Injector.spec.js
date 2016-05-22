@@ -184,6 +184,18 @@ describe('Injector container', function (){
                 expect(injector.resolve('Cache')).to.be.equal(Cache);
             });
         });
+
+        describe('a config object (as config)', function () {
+
+            it('should resolve the registered instance', function () {
+                const configObject = {},
+                    injector = new Injector();
+
+                injector.config('scope-name', configObject);
+
+                expect(injector.resolve('conf:scope-name')).to.be.equal(configObject);
+            });
+        });
     });
 
     describe('Resolver selection (with some example usage)', function () {
