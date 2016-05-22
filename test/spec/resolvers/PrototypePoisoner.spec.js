@@ -45,6 +45,21 @@ describe('PrototypePoisoner', function () {
                 expect(appInstance.injector).to.be.equal(injector);
             });
 
+            it('should make possible to access the injector from the constructor with overridden name', function() {
+
+                const AppFuncCustomNameDecl = function() {
+                    this.container.resolve('TestClass');
+                };
+                prototypePoisoner = new PrototypePoisoner('container');
+
+                const start = function() {
+                    appInstance = prototypePoisoner.factory(injector, AppFuncCustomNameDecl);
+                };
+
+                expect(start).to.not.throw();
+                expect(appInstance.container).to.be.equal(injector);
+            });
+
             it('should left the prototype chain unchanged after the constructor invoked', function() {
 
                 const start = function() {
@@ -103,6 +118,24 @@ describe('PrototypePoisoner', function () {
                 expect(appInstance.injector).to.be.equal(injector);
             });
 
+            it('should make possible to access the injector from the constructor with overridden name', function() {
+
+                class AppClassCustomNameDecl {
+                    constructor() {
+                        this.container.resolve('TestClass');
+                    }
+                }
+
+                prototypePoisoner = new PrototypePoisoner('container');
+
+                const start = function() {
+                    appInstance = prototypePoisoner.factory(injector, AppClassCustomNameDecl);
+                };
+
+                expect(start).to.not.throw();
+                expect(appInstance.container).to.be.equal(injector);
+            });
+
             it('should left the prototype chain unchanged after the constructor invoked', function() {
 
                 const start = function() {
@@ -130,12 +163,12 @@ describe('PrototypePoisoner', function () {
 
     describe('function', function () {
 
-        const testFunction = function(a, b) {
-            this.injector.resolve('Whatever');
-            return a + b;
-        };
-
         it('should make possible to access the injector from the function\'s context', function() {
+
+            const testFunction = function(a, b) {
+                this.injector.resolve('Whatever');
+                return a + b;
+            };
 
             let result = null;
             const start = function() {
@@ -146,6 +179,23 @@ describe('PrototypePoisoner', function () {
             expect(result).to.be.equal(7);
         });
 
+        it('should make possible to access the injector with custom name from the function\'s context', function() {
+
+            const testFunction = function(a, b) {
+                this.container.resolve('Whatever');
+                return a + b;
+            };
+
+            prototypePoisoner = new PrototypePoisoner('container');
+
+            let result = null;
+            const start = function() {
+                result = prototypePoisoner.function(injector, testFunction, 3, 4);
+            };
+
+            expect(start).to.not.throw();
+            expect(result).to.be.equal(7);
+        });
     });
 
     describe('static', function () {
