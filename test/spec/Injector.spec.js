@@ -580,15 +580,70 @@ describe('Injector container', function (){
             expect(scopeName2Config).to.be.equal(configObject.config.scopeName2);
         });
 
-        // don't init anything if there is no config:scope resolution
-        // don't init if it is already initialised
-        it.skip('should do nothing if there is no configuration object registered to the current namespace', function () {
+        it('should do nothing if there is no configuration object registered to the current namespace', function () {
 
             const injector = new Injector();
 
+            function initScope() {
+                injector.initScope();
+            }
+
+            expect(initScope).to.not.throw();
+            expect(injector.dependencies.size).to.be.equal(0);
+        });
+
+        it('should work fine [small integration test, usage example]', function () {
+
+            class App {
+                constructor(injector) {
+                    const reusableComponentScope = injector.createChild('reusable-component');
+                    this.reusableComponent = reusableComponentScope.resolve('ReusableComponent');
+                }
+            }
+
+            class ReusableComponent {
+                constructor(injector) {
+                    injector.initScope();
+                    this.dependency = injector.resolve('ReusableComponentsDependencyFactory');
+                    this.appWideGlobalInstance = injector.resolve('AppWideGlobalInstance');
+                    injector.resolve('ReusableComponentsDependencyFunction');
+                }
+            }
+
+            const reusableComponentConfig = {
+                factory: {
+                    'ReusableComponentsDependencyFactory': TestClass
+                },
+                function: {
+                    ReusableComponentsDependencyFunction: sinon.spy()
+                }
+            };
+            const appConfig = {
+                factory: {
+                    'App': App,
+                    'ReusableComponent': ReusableComponent
+                },
+                static: {
+                    'AppWideGlobalInstance': {}
+                },
+                config: {
+                    'reusable-component': reusableComponentConfig
+                }
+            };
+
+            let app;
+            const injector = new Injector();
+            injector.config(appConfig);
             injector.initScope();
 
-            expect(injector.dependencies.size).to.be.equal(0);
+            function start() {
+                app = injector.resolve('App');
+            }
+
+            expect(start).to.not.throw();
+            expect(app.reusableComponent.dependency).to.be.an.instanceOf(TestClass);
+            expect(app.reusableComponent.appWideGlobalInstance).to.be.equal(appConfig.static.AppWideGlobalInstance);
+            expect(reusableComponentConfig.function.ReusableComponentsDependencyFunction).to.have.been.called;
         });
     });
 });
