@@ -12,59 +12,100 @@ describe('ParamListPrepender', function () {
         paramListPrepender = new ParamListPrepender();
     });
 
-    describe('Factory', function () {
+    describe('Class and constructor function related', function () {
 
-        describe('Function declarations', function () {
+        const AppFuncDecl = function(injector, param1, param2) {
+            this.param1 = param1;
+            this.param2 = param2;
+            injector.resolve('Whatever');
+        };
+        AppFuncDecl.prototype = {
+            testMethod: function() {
+                return 42;
+            }
+        };
 
-            const AppFuncDecl = function(injector, param1, param2) {
+        class AppClassDecl {
+            constructor(injector, param1, param2) {
                 this.param1 = param1;
                 this.param2 = param2;
                 injector.resolve('Whatever');
-            };
+            }
 
-            it('should make possible to access the injector from the constructor', function() {
+            testMethod() {
+                return 42;
+            }
+        }
 
-                const start = function() {
-                    appInstance = paramListPrepender.factory(injector, AppFuncDecl, 'param1');
-                };
+        describe('factory', function () {
 
-                expect(start).to.not.throw();
+            describe('Function declarations', function () {
+
+                it('should make possible to access the injector from the constructor', function() {
+
+                    const start = function() {
+                        appInstance = paramListPrepender.factory(injector, AppFuncDecl, 'param1');
+                    };
+
+                    expect(start).to.not.throw();
+                });
+
+                it('should create an instance of given class with the passed parameters', function() {
+
+                    appInstance = paramListPrepender.factory(injector, AppFuncDecl, 'param1', 'param2');
+
+                    expect(appInstance.param1).to.be.equal('param1');
+                    expect(appInstance.param2).to.be.equal('param2');
+                });
             });
 
-            it('should create an instance of given class with the passed parameters', function() {
+            describe('Class declarations', function () {
 
-                appInstance = paramListPrepender.factory(injector, AppFuncDecl, 'param1', 'param2');
+                it('should make possible to access the injector from the constructor', function() {
 
-                expect(appInstance.param1).to.be.equal('param1');
-                expect(appInstance.param2).to.be.equal('param2');
+                    const start = function() {
+                        appInstance = paramListPrepender.factory(injector, AppClassDecl, 'param1');
+                    };
+
+                    expect(start).to.not.throw();
+                });
+
+                it('should create an instance of given class with the passed parameters', function() {
+
+                    appInstance = paramListPrepender.factory(injector, AppClassDecl, 'param1', 'param2');
+
+                    expect(appInstance.param1).to.be.equal('param1');
+                    expect(appInstance.param2).to.be.equal('param2');
+                });
             });
         });
 
-        describe('Class declarations', function () {
+        describe.only('factoryProvider', function () {
 
-            class AppClassDecl {
-                constructor(injector, param1, param2) {
-                    this.param1 = param1;
-                    this.param2 = param2;
-                    injector.resolve('Whatever');
-                }
-            }
-
-            it('should make possible to access the injector from the constructor', function() {
+            it('should work well for function declarations', function() {
 
                 const start = function() {
-                    appInstance = paramListPrepender.factory(injector, AppClassDecl, 'param1');
+                    let AppFuncDeclSurrogate = paramListPrepender.factoryProvider(injector, 'AppFuncDecl', AppFuncDecl);
+                    appInstance = new AppFuncDeclSurrogate('param1', 'param2');
                 };
 
                 expect(start).to.not.throw();
-            });
-
-            it('should create an instance of given class with the passed parameters', function() {
-
-                appInstance = paramListPrepender.factory(injector, AppClassDecl, 'param1', 'param2');
-
                 expect(appInstance.param1).to.be.equal('param1');
                 expect(appInstance.param2).to.be.equal('param2');
+                expect(appInstance.testMethod()).to.be.equal(42);
+            });
+
+            it('should work well for class declarations', function() {
+
+                const start = function() {
+                    let AppClassDeclSurrogate = paramListPrepender.factoryProvider(injector, 'AppClassDecl', AppClassDecl);
+                    appInstance = new AppClassDeclSurrogate('param1', 'param2');
+                };
+
+                expect(start).to.not.throw();
+                expect(appInstance.param1).to.be.equal('param1');
+                expect(appInstance.param2).to.be.equal('param2');
+                expect(appInstance.testMethod()).to.be.equal(42);
             });
         });
     });
