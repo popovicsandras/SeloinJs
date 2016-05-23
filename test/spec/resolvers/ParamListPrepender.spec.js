@@ -76,7 +76,7 @@ describe('ParamListPrepender', function () {
             return a + b;
         };
 
-        it('should make possible to access the injector from the constructor', function() {
+        it('should call the passed function with injecting the injector as first parameter', function() {
 
             let result = null;
             const start = function() {

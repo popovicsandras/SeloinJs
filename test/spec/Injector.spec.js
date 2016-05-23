@@ -1,8 +1,6 @@
 'use strict';
 
-import Injector from '../../lib/Injector';
-import ParamListAppender from '../../lib/resolvers/ParamListAppender';
-import PrototypePoisoner from '../../lib/resolvers/PrototypePoisoner';
+import {Injector, Resolvers} from '../../lib/package';
 
 class TestClass {
     constructor (injector, str, func, obj) {
@@ -282,7 +280,7 @@ describe('Injector container', function (){
         it('should set the passed resolver for the new child scope', function () {
 
             const injector = new Injector();
-            const resolver = new ParamListAppender();
+            const resolver = new Resolvers.ParamListAppender();
 
             const childScopeFromObject = injector.createChild({
                 scope: 'scope-name-from-options-object',
@@ -308,7 +306,7 @@ describe('Injector container', function (){
             injector.factory('TestClass', TestClass);
             const childScopeFromObject = injector.createChild({
                 scope: 'whatever',
-                resolver: new ParamListAppender()
+                resolver: new Resolvers.ParamListAppender()
             });
 
             function testResolve() {
@@ -564,7 +562,38 @@ describe('Injector container', function (){
 
     describe('Mini integration tests [usage example]', function () {
 
-        describe('ParamListPrepender and static resolvation', function () {
+        describe('SimpleResolver and factory resolution', function () {
+
+            let injector;
+
+            beforeEach(function() {
+                injector = new Injector({
+                    resolver: new Resolvers.SimpleResolver()
+                });
+                injector.factory('TestClass', TestClass);
+            });
+
+            it('should inject the injector to the end of constructor\'s parameter list', function() {
+
+                class App {
+                    constructor(param1, param2) {
+                        if (this.injector || arguments.length > 2) {
+                            throw new Error('');
+                        }
+                    }
+                }
+                injector.factory('App', App);
+
+                let app;
+                function start() {
+                    app = injector.resolve('App', 'param1', 'param2');
+                }
+
+                expect(start).to.not.throw();
+            });
+        });
+
+        describe('ParamListPrepender and static resolution', function () {
 
             it('should resolve the static instance', function() {
 
@@ -577,7 +606,7 @@ describe('Injector container', function (){
             });
         });
 
-        describe('ParamListPrepender and function resolvation', function () {
+        describe('ParamListPrepender and function resolution', function () {
 
             const testFunction = function(injector, str, obj) {
                 return {
@@ -601,13 +630,13 @@ describe('Injector container', function (){
             });
         });
 
-        describe('ParamListAppender and factory resolvation', function () {
+        describe('ParamListAppender and factory resolution', function () {
 
             let injector;
 
             beforeEach(function() {
                 injector = new Injector({
-                    resolver: new ParamListAppender()
+                    resolver: new Resolvers.ParamListAppender()
                 });
                 injector.factory('TestClass', TestClass);
             });
@@ -634,7 +663,7 @@ describe('Injector container', function (){
 
             beforeEach(function() {
                 services = new Injector({
-                    resolver: new PrototypePoisoner('services')
+                    resolver: new Resolvers.PrototypePoisoner('services')
                 });
             });
 
@@ -674,7 +703,7 @@ describe('Injector container', function (){
                     constructor(injector, param1) {
                         const reusableComponentScope = injector.createChild({
                             scope: 'reusable-component',
-                            resolver: new ParamListAppender()
+                            resolver: new Resolvers.ParamListAppender()
                         });
                         this.reusableComponent = reusableComponentScope.resolve('ReusableComponent', param1);
                     }
