@@ -80,32 +80,98 @@ describe('ParamListPrepender', function () {
             });
         });
 
-        describe.only('factoryProvider', function () {
+        describe('autoInjectedFactory', function () {
 
-            it('should work well for function declarations', function() {
+            describe('Function declarations', function () {
 
-                const start = function() {
-                    let AppFuncDeclSurrogate = paramListPrepender.factoryProvider(injector, 'AppFuncDecl', AppFuncDecl);
+                it('return a surrogate constructor function which injects the injector as the first parameter', function() {
+
+                    const start = function() {
+                        let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl);
+                        appInstance = new AppFuncDeclSurrogate();
+                    };
+
+                    expect(start).to.not.throw();
+                });
+
+                it('should call the original constructor function with the given parameters (after the injector)', function() {
+
+                    let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl);
                     appInstance = new AppFuncDeclSurrogate('param1', 'param2');
-                };
 
-                expect(start).to.not.throw();
-                expect(appInstance.param1).to.be.equal('param1');
-                expect(appInstance.param2).to.be.equal('param2');
-                expect(appInstance.testMethod()).to.be.equal(42);
+                    expect(appInstance.param1).to.be.equal('param1');
+                    expect(appInstance.param2).to.be.equal('param2');
+                });
+
+                it('should return a surrogate constructor which has a prototype that contains everything from the original one\'s', function() {
+
+                    let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl);
+                    appInstance = new AppFuncDeclSurrogate();
+
+                    expect(appInstance.testMethod()).to.be.equal(42);
+                });
+
+                it('should return a surrogate constructor whose prototype is cloned from the original\'s one', function() {
+
+                    let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl);
+                    appInstance = new AppFuncDeclSurrogate();
+
+                    expect(AppFuncDeclSurrogate.prototype).to.be.not.equal(AppFuncDecl.prototype);
+                    expect(AppFuncDeclSurrogate.prototype.constructor).to.be.equal(AppFuncDeclSurrogate);
+                });
+
+                it('should set the surrogate constructor function\'s __origin__ to the original service\'s name', function() {
+
+                    let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl, 'AppFuncDecl');
+
+                    expect(AppFuncDeclSurrogate.__origin__).to.be.equal('AppFuncDecl');
+                });
             });
 
-            it('should work well for class declarations', function() {
+            describe('Class declarations', function () {
 
-                const start = function() {
-                    let AppClassDeclSurrogate = paramListPrepender.factoryProvider(injector, 'AppClassDecl', AppClassDecl);
+                it('return a surrogate constructor function which injects the injector as the first parameter', function() {
+
+                    const start = function() {
+                        let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl);
+                        appInstance = new AppClassDeclSurrogate();
+                    };
+
+                    expect(start).to.not.throw();
+                });
+
+                it('should call the original constructor function with the given parameters (after the injector)', function() {
+
+                    let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl);
                     appInstance = new AppClassDeclSurrogate('param1', 'param2');
-                };
 
-                expect(start).to.not.throw();
-                expect(appInstance.param1).to.be.equal('param1');
-                expect(appInstance.param2).to.be.equal('param2');
-                expect(appInstance.testMethod()).to.be.equal(42);
+                    expect(appInstance.param1).to.be.equal('param1');
+                    expect(appInstance.param2).to.be.equal('param2');
+                });
+
+                it('should return a surrogate constructor which has a prototype that contains everything from the original one\'s', function() {
+
+                    let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl);
+                    appInstance = new AppClassDeclSurrogate();
+
+                    expect(appInstance.testMethod()).to.be.equal(42);
+                });
+
+                it('should return a surrogate constructor whose prototype is cloned from the original\'s one', function() {
+
+                    let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl);
+                    appInstance = new AppClassDeclSurrogate();
+
+                    expect(AppClassDeclSurrogate.prototype).to.be.not.equal(AppClassDecl.prototype);
+                    expect(AppClassDeclSurrogate.prototype.constructor).to.be.equal(AppClassDeclSurrogate);
+                });
+
+                it('should set the surrogate constructor function\'s __origin__ to the original service\'s name', function() {
+
+                    let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl, 'AppClassDecl');
+
+                    expect(AppClassDeclSurrogate.__origin__).to.be.equal('AppClassDecl');
+                });
             });
         });
     });
