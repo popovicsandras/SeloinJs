@@ -1,6 +1,6 @@
 'use strict';
 
-import { default as ParamListPrepender } from '../../../lib/resolvers/ParamListPrepender.js';
+import { default as ParamListPrepender } from '../../../lib/resolvers/ParamListPrepender';
 
 describe('ParamListPrepender', function () {
 
@@ -62,7 +62,7 @@ describe('ParamListPrepender', function () {
         describe('autoInjectedFactory', function () {
 
             given(AppFuncDecl, AppClassDecl)
-                .it('return a surrogate constructor function which injects the injector as the first parameter', function(ConstructorDeclaration) {
+                .it('should return a surrogate constructor function which injects the injector as the first parameter', function(ConstructorDeclaration) {
 
                     const start = function() {
                         let ConstructorSurrogate = paramListPrepender.autoInjectedFactory(injector, ConstructorDeclaration);
@@ -101,8 +101,8 @@ describe('ParamListPrepender', function () {
                     expect(ConstructorSurrogate.prototype.constructor).to.be.equal(ConstructorSurrogate);
                 });
 
-            given(  [AppFuncDecl, 'AppFuncDecl'],
-                    [AppClassDecl, 'AppClassDecl'])
+            given(  [AppFuncDecl, 'AppFuncDeclFancyName'],
+                    [AppClassDecl, 'AppClassDeclFancyName'])
                 .it('should set the surrogate constructor function\'s __origin__ to the original service\'s name', function(ConstructorDeclaration, ConstructorDeclarationName) {
 
                     let ConstructorSurrogate = paramListPrepender.autoInjectedFactory(injector, ConstructorDeclaration, ConstructorDeclarationName);
@@ -112,22 +112,68 @@ describe('ParamListPrepender', function () {
         });
     });
 
-    describe('Function', function () {
+    describe('Function related', function () {
 
         const testFunction = function(injector, a, b) {
             injector.resolve('Whatever');
             return a + b;
         };
 
-        it('should call the passed function with injecting the injector as first parameter', function() {
+        const testFunctionWithContext = function(injector, a, b) {
+            this.result = a + b;
+        };
 
-            let result = null;
-            const start = function() {
-                result = paramListPrepender.function(injector, testFunction, 3, 4);
-            };
+        describe('function', function () {
 
-            expect(start).to.not.throw();
-            expect(result).to.be.equal(7);
+            it('should call the passed function with injecting the injector as first parameter', function() {
+
+                let result = null;
+                const start = function() {
+                    result = paramListPrepender.function(injector, testFunction, 3, 4);
+                };
+
+                expect(start).to.not.throw();
+                expect(result).to.be.equal(7);
+            });
+        });
+
+        describe('autoInjectedFunction', function () {
+
+            it('return a surrogate function which injects the injector as the first parameter', function () {
+
+                const start = function() {
+                    let surrogateFunction = paramListPrepender.autoInjectedFunction(injector, testFunction);
+                    surrogateFunction(3, 4);
+                };
+
+                expect(start).to.not.throw();
+            });
+
+            it('should call the original function with the given parameters (after the injector)', function () {
+
+                const surrogateFunction = paramListPrepender.autoInjectedFunction(injector, testFunction);
+                let result = surrogateFunction(3, 4);
+
+                expect(result).to.be.equal(7);
+            });
+
+            it('should call the original function on the same context as the surrogate function', function () {
+
+                const testContext = {
+                    result: null
+                };
+                const surrogateFunction = paramListPrepender.autoInjectedFunction(injector, testFunctionWithContext);
+                surrogateFunction.call(testContext, 5, 6);
+
+                expect(testContext.result).to.be.equal(11);
+            });
+
+            it('should set the surrogate function\'s __origin__ to the original function\'s name', function () {
+
+                const surrogateFunction = paramListPrepender.autoInjectedFunction(injector, testFunction, 'testFunctionFancyName');
+
+                expect(surrogateFunction.__origin__).to.be.equal('testFunctionFancyName');
+            });
         });
     });
 
