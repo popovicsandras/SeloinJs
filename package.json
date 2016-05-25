@@ -24,6 +24,7 @@
     "jshint": "^2.9.2",
     "jshint-stylish": "^2.2.0",
     "mocha": "^2.4.5",
+    "mocha-testdata": "^1.2.0",
     "mocha-webpack": "^0.3.1",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",

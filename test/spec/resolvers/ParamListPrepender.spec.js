@@ -39,140 +39,76 @@ describe('ParamListPrepender', function () {
 
         describe('factory', function () {
 
-            describe('Function declarations', function () {
-
-                it('should make possible to access the injector from the constructor', function() {
+            given(AppFuncDecl, AppClassDecl)
+                .it('should make possible to access the injector from the constructor', function(ConstructorDeclaration) {
 
                     const start = function() {
-                        appInstance = paramListPrepender.factory(injector, AppFuncDecl, 'param1');
+                        appInstance = paramListPrepender.factory(injector, ConstructorDeclaration, 'param1');
                     };
 
                     expect(start).to.not.throw();
                 });
 
-                it('should create an instance of given class with the passed parameters', function() {
+            given(AppFuncDecl, AppClassDecl)
+                .it('should create an instance of given class with the passed parameters', function(ConstructorDeclaration) {
 
-                    appInstance = paramListPrepender.factory(injector, AppFuncDecl, 'param1', 'param2');
-
-                    expect(appInstance.param1).to.be.equal('param1');
-                    expect(appInstance.param2).to.be.equal('param2');
-                });
-            });
-
-            describe('Class declarations', function () {
-
-                it('should make possible to access the injector from the constructor', function() {
-
-                    const start = function() {
-                        appInstance = paramListPrepender.factory(injector, AppClassDecl, 'param1');
-                    };
-
-                    expect(start).to.not.throw();
-                });
-
-                it('should create an instance of given class with the passed parameters', function() {
-
-                    appInstance = paramListPrepender.factory(injector, AppClassDecl, 'param1', 'param2');
+                    appInstance = paramListPrepender.factory(injector, ConstructorDeclaration, 'param1', 'param2');
 
                     expect(appInstance.param1).to.be.equal('param1');
                     expect(appInstance.param2).to.be.equal('param2');
                 });
-            });
         });
 
         describe('autoInjectedFactory', function () {
 
-            describe('Function declarations', function () {
-
-                it('return a surrogate constructor function which injects the injector as the first parameter', function() {
+            given(AppFuncDecl, AppClassDecl)
+                .it('return a surrogate constructor function which injects the injector as the first parameter', function(ConstructorDeclaration) {
 
                     const start = function() {
-                        let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl);
-                        appInstance = new AppFuncDeclSurrogate();
+                        let ConstructorSurrogate = paramListPrepender.autoInjectedFactory(injector, ConstructorDeclaration);
+                        appInstance = new ConstructorSurrogate();
                     };
 
                     expect(start).to.not.throw();
                 });
 
-                it('should call the original constructor function with the given parameters (after the injector)', function() {
+            given(AppFuncDecl, AppClassDecl)
+                .it('should call the original constructor function with the given parameters (after the injector)', function(ConstructorDeclaration) {
 
-                    let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl);
-                    appInstance = new AppFuncDeclSurrogate('param1', 'param2');
-
-                    expect(appInstance.param1).to.be.equal('param1');
-                    expect(appInstance.param2).to.be.equal('param2');
-                });
-
-                it('should return a surrogate constructor which has a prototype that contains everything from the original one\'s', function() {
-
-                    let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl);
-                    appInstance = new AppFuncDeclSurrogate();
-
-                    expect(appInstance.testMethod()).to.be.equal(42);
-                });
-
-                it('should return a surrogate constructor whose prototype is cloned from the original\'s one', function() {
-
-                    let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl);
-                    appInstance = new AppFuncDeclSurrogate();
-
-                    expect(AppFuncDeclSurrogate.prototype).to.be.not.equal(AppFuncDecl.prototype);
-                    expect(AppFuncDeclSurrogate.prototype.constructor).to.be.equal(AppFuncDeclSurrogate);
-                });
-
-                it('should set the surrogate constructor function\'s __origin__ to the original service\'s name', function() {
-
-                    let AppFuncDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppFuncDecl, 'AppFuncDecl');
-
-                    expect(AppFuncDeclSurrogate.__origin__).to.be.equal('AppFuncDecl');
-                });
-            });
-
-            describe('Class declarations', function () {
-
-                it('return a surrogate constructor function which injects the injector as the first parameter', function() {
-
-                    const start = function() {
-                        let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl);
-                        appInstance = new AppClassDeclSurrogate();
-                    };
-
-                    expect(start).to.not.throw();
-                });
-
-                it('should call the original constructor function with the given parameters (after the injector)', function() {
-
-                    let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl);
-                    appInstance = new AppClassDeclSurrogate('param1', 'param2');
+                    let ConstructorSurrogate = paramListPrepender.autoInjectedFactory(injector, ConstructorDeclaration);
+                    appInstance = new ConstructorSurrogate('param1', 'param2');
 
                     expect(appInstance.param1).to.be.equal('param1');
                     expect(appInstance.param2).to.be.equal('param2');
                 });
 
-                it('should return a surrogate constructor which has a prototype that contains everything from the original one\'s', function() {
+            given(AppFuncDecl, AppClassDecl)
+                .it('should return a surrogate constructor which has a prototype that contains everything from the original one\'s', function(ConstructorDeclaration) {
 
-                    let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl);
-                    appInstance = new AppClassDeclSurrogate();
+                    let ConstructorSurrogate = paramListPrepender.autoInjectedFactory(injector, ConstructorDeclaration);
+                    appInstance = new ConstructorSurrogate();
 
                     expect(appInstance.testMethod()).to.be.equal(42);
                 });
 
-                it('should return a surrogate constructor whose prototype is cloned from the original\'s one', function() {
+            given(AppFuncDecl, AppClassDecl)
+                .it('should return a surrogate constructor whose prototype is cloned from the original\'s one', function(ConstructorDeclaration) {
 
-                    let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl);
-                    appInstance = new AppClassDeclSurrogate();
+                    let ConstructorSurrogate = paramListPrepender.autoInjectedFactory(injector, ConstructorDeclaration);
+                    appInstance = new ConstructorSurrogate();
 
-                    expect(AppClassDeclSurrogate.prototype).to.be.not.equal(AppClassDecl.prototype);
-                    expect(AppClassDeclSurrogate.prototype.constructor).to.be.equal(AppClassDeclSurrogate);
+                    expect(ConstructorSurrogate.prototype).to.be.not.equal(ConstructorDeclaration.prototype);
+                    expect(ConstructorSurrogate.prototype.constructor).to.be.equal(ConstructorSurrogate);
                 });
 
-                it('should set the surrogate constructor function\'s __origin__ to the original service\'s name', function() {
+            given(  [AppFuncDecl, 'AppFuncDecl'],
+                    [AppClassDecl, 'AppClassDecl'])
+                .it('should set the surrogate constructor function\'s __origin__ to the original service\'s name', function(ConstructorDeclaration, ConstructorDeclarationName) {
 
-                    let AppClassDeclSurrogate = paramListPrepender.autoInjectedFactory(injector, AppClassDecl, 'AppClassDecl');
+                    let ConstructorSurrogate = paramListPrepender.autoInjectedFactory(injector, ConstructorDeclaration, ConstructorDeclarationName);
 
-                    expect(AppClassDeclSurrogate.__origin__).to.be.equal('AppClassDecl');
+                    expect(ConstructorSurrogate.__origin__).to.be.equal(ConstructorDeclarationName);
                 });
-            });
         });
     });
 

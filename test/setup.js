@@ -6,6 +6,7 @@ global.expect = require('chai').expect;
 global.assert = require('chai').assert;
 global.AssertionError = require('chai').AssertionError;
 global.sinon = require('sinon');
+global.given = require('mocha-testdata');
 
 global.swallow = function (thrower) {
     try {
