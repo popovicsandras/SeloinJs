@@ -3,6 +3,7 @@ define(['backbone.marionette'], function (Marionette) {
     var TodoLayoutView = Marionette.LayoutView.extend({
 
         initialize: function() {
+            this.injector.initScope();
             this.template = this.injector.resolve('CharacterListLayoutTemplate');
         },
 

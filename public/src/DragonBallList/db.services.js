@@ -1,16 +1,20 @@
 define(function (require) {
 
     return {
-        'CharacterListLayout': require('CharacterList/views/CharacterListLayout'),
-        // Overridden
-        'CharacterListLayoutTemplate': require('text!DragonBallList/templates/DragonBallCharacterListLayout.html'),
+        factory: {
+            'CharacterSearchView': require('CharacterList/views/CharacterSearchView'),
+            'CharacterListCollectionView': require('CharacterList/views/CharacterListCollectionView'),
+            'CharacterListItemView': require('DragonBallList/views/DragonBallCharacterListItemView'),
 
-        'CharacterSearchView': require('CharacterList/views/CharacterSearchView'),
-        'CharacterListCollectionView': require('CharacterList/views/CharacterListCollectionView'),
-        'CharacterListItemView': require('CharacterList/views/CharacterListItemView'),
-
-        // Overridden
-        'CharacterListCollection': require('DragonBallList/DragonBallCharacterCollection'),
-        'DragonBallCharacterModel': require('DragonBallList/DragonBallCharacterModel')
+            // Overridden
+            'CharacterListCollection': require('DragonBallList/collections/DragonBallCharacterCollection'),
+            'CharacterModel': require('DragonBallList/models/DragonBallCharacterModel')
+        },
+        static: {
+            // Overridden
+            'CharacterListLayoutTemplate': require('text!DragonBallList/templates/DragonBallCharacterListLayout.html'),
+            'CharacterListCollectionTemplate': require('text!DragonBallList/templates/DragonBallCharacterListCollectionView.html'),
+            'CharacterListItemTemplate': require('text!DragonBallList/templates/DragonBallCharacterListItemView.html')
+        }
     };
 });

@@ -11,8 +11,18 @@
 
     <script>
         document.currentScript.src ='';
-        require(['App', 'bootstrap'], function (App) {
-            var app = new App({container: '#app'});
+        require(['seloin', 'app.services', 'bootstrap'], function (Seloin, appConfig) {
+
+            var rootInjector = new Seloin.Injector({
+                resolver: new Seloin.Resolvers.PrototypePoisoner()
+            });
+
+            // Registers the config object to conf:root
+            rootInjector.config(appConfig);
+            // Parses the conf:root and load all defined dependencies form there
+            rootInjector.initScope();
+
+            var app = rootInjector.resolve('App', {container: '#app'});
             app.start();
         });
     </script>

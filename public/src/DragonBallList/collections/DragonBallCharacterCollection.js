@@ -1,8 +1,12 @@
-define(['backbone', 'DragonBallList/DragonBallCharacterModel'], function (Backbone, DragonBallCharacterModel) {
+define(['backbone', 'DragonBallList/models/DragonBallCharacterModel'], function (Backbone, CharacterModel) {
 
     var DragonBallCharacterCollection = Backbone.Collection.extend({
 
-        model: DragonBallCharacterModel,
+        model: CharacterModel,
+
+        //initialize: function() {
+        //    this.model = this.injector.resolveProvider('CharacterModel');
+        //},
 
         load: function() {
             this.reset([{
