@@ -4,6 +4,7 @@ import {Injector, Resolvers} from '../../lib/package';
 
 class TestClass {
     constructor (injector, str, func, obj) {
+        injector.resolve('TestClass2');
         this.str = str;
         this.func = func;
         this.obj = obj;
@@ -84,6 +85,7 @@ describe('Injector container', function (){
             const injector = new Injector();
 
             injector.factory('TestClass', TestClass);
+            injector.factory('TestClass2', TestClass2);
             try {
                 injector.factory('TestClass', TestClass2);
             }
@@ -115,74 +117,130 @@ describe('Injector container', function (){
             expect(testFunc).to.throw(Error, 'Dependency not found: test');
         });
 
-        describe('an instance (as factory)', function () {
+        describe('when registered as factory', function () {
 
-            it('should resolve by creating a new instance of given function', function() {
+            describe('an instance', function () {
 
-                const injector = new Injector();
+                it('should resolve by creating a new instance of given function', function() {
 
-                injector.factory('TestClass', TestClass);
+                    const injector = new Injector();
 
-                expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
+                    injector.factory('TestClass', TestClass);
+                    injector.factory('TestClass2', TestClass2);
+
+                    expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
+                });
+
+                it('should resolve the registered service with additional arguments', function() {
+
+                    const expectedStr = 'Diva Plavalaguna 5X',
+                        expectedFunc = function() { return 'Multipass!'; },
+                        expectedObj = {
+                            color: 'super-green'
+                        },
+                        injector = new Injector();
+
+                    injector.factory('TestClass', TestClass);
+                    injector.factory('TestClass2', TestClass2);
+
+                    const instance = injector.resolve('TestClass', expectedStr, expectedFunc, expectedObj);
+                    expect(instance.str).to.be.equal(expectedStr);
+                    expect(instance.func).to.be.equal(expectedFunc);
+                    expect(instance.obj).to.be.equal(expectedObj);
+                });
             });
 
-            it('should resolve the registered service with additional arguments', function() {
+            describe('a provider', function () {
 
-                const expectedStr = 'Diva Plavalaguna 5X',
-                    expectedFunc = function() { return 'Multipass!'; },
-                    expectedObj = {
-                        color: 'super-green'
-                    },
-                    injector = new Injector();
+                it('should resolve by returning the inherited surrogate constructor function', function() {
 
-                injector.factory('TestClass', TestClass);
+                    const injector = new Injector();
+                    injector.factory('TestClass2', TestClass2);
 
-                const instance = injector.resolve('TestClass', expectedStr, expectedFunc, expectedObj);
-                expect(instance.str).to.be.equal(expectedStr);
-                expect(instance.func).to.be.equal(expectedFunc);
-                expect(instance.obj).to.be.equal(expectedObj);
+                    const autoInjectedTestClass2 = injector.resolveProvider('TestClass2');
+
+                    expect(new autoInjectedTestClass2()).to.be.an.instanceOf(TestClass2);
+                    expect(autoInjectedTestClass2.__origin__).to.be.equal('TestClass2');
+                });
+
+                it('should resolve by returning the autoInjected constructor function', function() {
+
+                    const expectedStr = 'Diva Plavalaguna 5X',
+                        expectedFunc = function() { return 'Multipass!'; },
+                        expectedObj = {
+                            color: 'super-green'
+                        },
+                        injector = new Injector();
+
+                    injector.factory('TestClass', TestClass);
+                    injector.factory('TestClass2', TestClass2);
+                    const autoInjectedTestClass = injector.resolveProvider('TestClass');
+
+                    let instance;
+                    function createInstance() {
+                        instance = new autoInjectedTestClass(expectedStr, expectedFunc, expectedObj);
+                    }
+
+                    expect(createInstance).to.not.throw();
+                    expect(instance.str).to.be.equal(expectedStr);
+                    expect(instance.func).to.be.equal(expectedFunc);
+                    expect(instance.obj).to.be.equal(expectedObj);
+                });
             });
         });
 
-        describe('a provider (as factory)', function () {
+        describe('when registered as function', function () {
 
-            it('should resolve by creating a new instance of given function', function() {
+            describe('resolve the function\'s invocation result', function () {
 
-                const injector = new Injector();
-                injector.factory('TestClass', TestClass);
+                it('should resolve by simply invoking given function', function() {
 
-                const autoInjectedTestClass = injector.resolveProvider('TestClass');
+                    const testFunction = sinon.spy();
+                    const injector = new Injector();
 
-                expect(new autoInjectedTestClass()).to.be.an.instanceOf(TestClass);
+                    injector.function('TestFunction', testFunction);
+                    injector.resolve('TestFunction', 1, 2, 3);
+
+                    expect(testFunction).to.have.been.called;
+                });
+
+                it('should resolve by simply invoking given function with given parameters', function() {
+
+                    const testFunction = function (injector, a, b, c) {
+                        return a + b + c;
+                    };
+                    const injector = new Injector();
+
+                    injector.function('TestFunction', testFunction);
+                    const sum = injector.resolve('TestFunction', 1, 2, 3);
+
+                    expect(sum).to.be.equal(6);
+                });
             });
 
+            describe('resolve the function provider', function () {
 
-        });
+                it('should have the injector auto injected', function() {
 
-        describe('a function (as function)', function () {
+                    const testFunction = function (injector, a, b, c) {
+                        injector.resolve('TestClass2');
+                        return a + b + c;
+                    };
 
-            it('should resolve by simply invoking given function', function() {
+                    const injector = new Injector();
+                    injector.function('TestFunction', testFunction);
+                    injector.factory('TestClass2', TestClass2);
+                    const testFunctionSurrogate = injector.resolveProvider('TestFunction');
 
-                const testFunction = sinon.spy();
-                const injector = new Injector();
+                    let sum;
+                    function invoke() {
+                        testFunctionSurrogate();
+                        sum = testFunctionSurrogate(1, 2, 3);
+                    }
 
-                injector.function('TestFunction', testFunction);
-                injector.resolve('TestFunction', 1, 2, 3);
-
-                expect(testFunction).to.have.been.called;
-            });
-
-            it('should resolve by simply invoking given function with given parameters', function() {
-
-                const testFunction = function (injector, a, b, c) {
-                    return a + b + c;
-                };
-                const injector = new Injector();
-
-                injector.function('TestFunction', testFunction);
-                const sum = injector.resolve('TestFunction', 1, 2, 3);
-
-                expect(sum).to.be.equal(6);
+                    expect(invoke).to.not.throw();
+                    expect(sum).to.be.equal(6);
+                });
             });
         });
 
@@ -319,6 +377,7 @@ describe('Injector container', function (){
             const injector = new Injector();
             injector.factory('TestForOverriddenResolver', TestForOverriddenResolver);
             injector.factory('TestClass', TestClass);
+            injector.factory('TestClass2', TestClass2);
             const childScopeFromObject = injector.createChild({
                 scope: 'whatever',
                 resolver: new Resolvers.ParamListAppender()
@@ -388,6 +447,7 @@ describe('Injector container', function (){
             injector.factory('Level1', Level1);
             injector.factory('Level2', Level2);
             injector.factory('TestClass', TestClass);
+            injector.factory('TestClass2', TestClass2);
 
             const app = injector.resolve('App');
 
@@ -654,6 +714,7 @@ describe('Injector container', function (){
                     resolver: new Resolvers.ParamListAppender()
                 });
                 injector.factory('TestClass', TestClass);
+                injector.factory('TestClass2', TestClass2);
             });
 
             it('should inject the injector to the end of constructor\'s parameter list', function() {
@@ -737,7 +798,8 @@ describe('Injector container', function (){
 
                 const reusableComponentConfig = {
                     factory: {
-                        'ReusableComponentsDependencyFactory': TestClass
+                        'ReusableComponentsDependencyFactory': TestClass,
+                        'TestClass2': TestClass2
                     },
                     function: {
                         ReusableComponentsDependencyFunction: sinon.spy()
