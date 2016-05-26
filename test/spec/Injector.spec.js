@@ -144,6 +144,21 @@ describe('Injector container', function (){
             });
         });
 
+        describe('a provider (as factory)', function () {
+
+            it('should resolve by creating a new instance of given function', function() {
+
+                const injector = new Injector();
+                injector.factory('TestClass', TestClass);
+
+                const autoInjectedTestClass = injector.resolveProvider('TestClass');
+
+                expect(new autoInjectedTestClass()).to.be.an.instanceOf(TestClass);
+            });
+
+
+        });
+
         describe('a function (as function)', function () {
 
             it('should resolve by simply invoking given function', function() {
