@@ -622,7 +622,7 @@ describe('Injector container', function (){
             expect(scopeName2Config).to.be.equal(configObject.config.scopeName2);
         });
 
-        it('should do nothing if there is no configuration object registered to the current namespace', function () {
+        it('should do nothing if there is no configuration object registered to the current scope', function () {
 
             const injector = new Injector();
 
@@ -631,7 +631,7 @@ describe('Injector container', function (){
             }
 
             expect(initScope).to.not.throw();
-            expect(injector.dependencies.size).to.be.equal(0);
+            expect(injector.services.size).to.be.equal(0);
         });
     });
 
