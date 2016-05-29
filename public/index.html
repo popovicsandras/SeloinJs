@@ -11,19 +11,21 @@
 
     <script>
         document.currentScript.src ='';
-        require(['seloin', 'app.services', 'bootstrap'], function (Seloin, appConfig) {
+        require(['seloin', 'backbone.seloin', 'backbone.marionette', 'bootstrap'], function (Seloin, BackboneResolver) {
+            require(['app.services'], function (appConfig) {
 
-            var rootInjector = new Seloin.Injector({
-                resolver: new Seloin.Resolvers.PrototypePoisoner()
+                var rootInjector = new Seloin.Injector({
+                    resolver: new BackboneResolver()
+                });
+
+                // Registers the config object to conf:root
+                rootInjector.config(appConfig);
+                // Parses the conf:root and load all defined dependencies form there
+                rootInjector.initScope();
+
+                var app = rootInjector.resolve('App', {container: '#app'});
+                app.start();
             });
-
-            // Registers the config object to conf:root
-            rootInjector.config(appConfig);
-            // Parses the conf:root and load all defined dependencies form there
-            rootInjector.initScope();
-
-            var app = rootInjector.resolve('App', {container: '#app'});
-            app.start();
         });
     </script>
 </body>

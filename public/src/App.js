@@ -2,6 +2,7 @@ define(['backbone.marionette'], function (Marionette) {
 
     return Marionette.Application.extend({
         initialize: function(options) {
+            this.injector = options.injector;
             this.addRegions({
                 main: options.container
             });

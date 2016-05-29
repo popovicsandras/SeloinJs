@@ -16,7 +16,8 @@ define(['backbone.marionette', 'underscore'], function (Marionette, _) {
             'click @ui.decreaseButton': 'decreaseValue'
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.injector = options.injector;
             this.listenTo(this.model, 'change:exp', this.updateValues);
             this.template = _.template(this.injector.resolve('CharacterListItemTemplate'));
         },

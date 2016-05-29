@@ -8,7 +8,8 @@ define(['backbone.marionette'], function (Marionette) {
             dragonball: "#dragonball"
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.injector = options.injector;
             this.template = this.injector.resolve('MainLayoutTemplate');
         },
 

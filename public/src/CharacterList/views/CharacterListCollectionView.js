@@ -4,7 +4,8 @@ define(['backbone.marionette', 'underscore'], function (Marionette, _) {
         //template: _.template(template),
         childViewContainer: "tbody",
 
-        initialize: function() {
+        initialize: function(options) {
+            this.injector = options.injector;
             this.collection.load();
             this.template = _.template(this.injector.resolve('CharacterListCollectionTemplate'));
         },
