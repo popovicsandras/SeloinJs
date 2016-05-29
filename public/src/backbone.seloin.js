@@ -1,4 +1,4 @@
-define(['backbone'], function (Backbone) {
+define(['backbone', 'backbone.marionette'], function (Backbone, Marionette) {
 
     var oldCollection = Backbone.Collection;
     Backbone.Collection = function() {
@@ -14,7 +14,22 @@ define(['backbone'], function (Backbone) {
     Backbone.Collection.extend = oldCollection.extend;
 
 
+    oldCompositeView = Marionette.CompositeView;
+    var SeloinCompositeView = oldCompositeView.extend({
+        getChildView: function() {
+            var childView = this.getOption('childView');
 
+            var options = this.options;
+            var resolution = /^resolve\:\:([a-zA-Z0-9\-]+)$/.exec(childView);
+            if (resolution && resolution[1]) {
+                this.childView = options.injector.resolveProvider(resolution[1]);
+            }
+
+            return oldCompositeView.prototype.getChildView.apply(this, arguments);
+        }
+    });
+
+    Marionette.CompositeView = SeloinCompositeView;
 
 
     function BackboneResolver() {}
