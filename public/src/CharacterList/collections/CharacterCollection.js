@@ -1,12 +1,13 @@
-define(['backbone', 'CharacterList/models/CharacterModel'], function (Backbone, CharacterModel) {
+define(['backbone'], function (Backbone) {
 
     var CharacterCollection = Backbone.Collection.extend({
 
-        model: CharacterModel,
+        model: 'resolve::CharacterModel',
 
-        //initialize: function() {
-        //    this.model = this.injector.resolveProvider('CharacterModel');
-        //},
+        initialize: function() {
+            var options = arguments[arguments.length - 1];
+            this.injector = options.injector;
+        },
 
         load: function() {
             this.reset([{

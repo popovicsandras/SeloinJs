@@ -5,6 +5,12 @@ define(['backbone'], function (Backbone) {
             name: '',
             hairColor: '',
             eyeColor: ''
+        },
+
+        initialize: function(attributes, options) {
+            if (!options.injector) {
+                throw new Error('Injector has to be accessible through options');
+            }
         }
     });
 
