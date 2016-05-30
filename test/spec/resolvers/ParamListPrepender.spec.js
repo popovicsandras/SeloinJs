@@ -177,13 +177,22 @@ describe('ParamListPrepender', function () {
         });
     });
 
-    describe('Static', function () {
+    describe('Static related', function () {
 
-        it('should simply return the instance object', function() {
+        it('should simply return the instance object in case of static', function() {
 
             const testInstance = {};
 
             let result = paramListPrepender.static(injector, testInstance);
+
+            expect(result).to.be.equal(testInstance);
+        });
+
+        it('should simply return the instance object in case of autoInjectedStatic', function() {
+
+            const testInstance = {};
+
+            let result = paramListPrepender.autoInjectedStatic(injector, testInstance);
 
             expect(result).to.be.equal(testInstance);
         });
