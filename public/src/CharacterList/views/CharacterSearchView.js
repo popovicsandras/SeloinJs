@@ -1,7 +1,7 @@
-define(['backbone.marionette', 'text!../templates/CharacterSearchView.html'], function (Marionette, template) {
+define(['backbone.marionette'], function (Marionette) {
 
     var SearchView = Marionette.ItemView.extend({
-        template: template
+        template: 'resolve::CharacterSearchTemplate'
     });
 
     return SearchView;

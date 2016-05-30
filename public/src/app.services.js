@@ -1,5 +1,7 @@
 define(function (require) {
 
+    var _ = require('underscore');
+
     return {
         factory: {
             'App': require('App'),
@@ -8,7 +10,9 @@ define(function (require) {
             'CharacterListLayout': require('CharacterList/views/CharacterListLayout')
         },
         static: {
-            'MainLayoutTemplate': require('text!templates/MainLayout.html')
+            'MainLayoutTemplate': _.template(require('text!templates/MainLayout.html')),
+            'MenuLayoutTemplate': _.template(require('text!templates/MenuLayout.html')),
+            'CharacterListLayoutTemplate': _.template(require('text!CharacterList/templates/CharacterListLayout.html'))
         },
         config: {
             'original-component': require('CharacterList/characterlist.services'),

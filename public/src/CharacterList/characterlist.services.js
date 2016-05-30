@@ -1,5 +1,7 @@
 define(function (require) {
 
+    var _ = require('underscore');
+
     return {
         factory: {
             'CharacterSearchView': require('CharacterList/views/CharacterSearchView'),
@@ -9,9 +11,10 @@ define(function (require) {
             'CharacterModel': require('CharacterList/models/CharacterModel')
         },
         static: {
-            // Overridden
-            'CharacterListLayoutTemplate': require('text!CharacterList/templates/CharacterListLayout.html'),
-            'CharacterListCollectionTemplate': require('text!CharacterList/templates/CharacterListCollectionView.html')
+            'CharacterListLayoutTemplate': _.template(require('text!CharacterList/templates/CharacterListLayout.html')),
+            'CharacterListCollectionTemplate': _.template(require('text!CharacterList/templates/CharacterListCollectionView.html')),
+            'CharacterListItemTemplate': _.template(require('text!CharacterList/templates/CharacterListItemView.html')),
+            'CharacterSearchTemplate': _.template(require('text!CharacterList/templates/CharacterSearchView.html'))
         }
     };
 });

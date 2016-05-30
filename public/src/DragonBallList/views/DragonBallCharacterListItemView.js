@@ -2,7 +2,7 @@ define(['backbone.marionette', 'underscore'], function (Marionette, _) {
 
     var ListItemView = Marionette.ItemView.extend({
         tagName: 'tr',
-        //template: _.template(template),
+        template: 'resolve::CharacterListItemTemplate',
 
         ui: {
             increaseButton: '.increase-value',
@@ -19,7 +19,6 @@ define(['backbone.marionette', 'underscore'], function (Marionette, _) {
         initialize: function(options) {
             this.injector = options.injector;
             this.listenTo(this.model, 'change:exp', this.updateValues);
-            this.template = _.template(this.injector.resolve('CharacterListItemTemplate'));
         },
 
         increaseValue: function() {

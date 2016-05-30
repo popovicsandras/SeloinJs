@@ -1,14 +1,13 @@
-define(['backbone.marionette', 'underscore'], function (Marionette, _) {
+define(['backbone.marionette'], function (Marionette) {
 
     var ListCollectionView = Marionette.CompositeView.extend({
-        //template: _.template(template),
-        childViewContainer: "tbody",
+        template: 'resolve::CharacterListCollectionTemplate',
         childView: 'resolve::CharacterListItemView',
+        childViewContainer: "tbody",
 
         initialize: function(options) {
             this.injector = options.injector;
             this.collection.load();
-            this.template = _.template(this.injector.resolve('CharacterListCollectionTemplate'));
         }
     });
 

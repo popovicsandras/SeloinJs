@@ -1,35 +1,36 @@
 define(['backbone', 'backbone.marionette'], function (Backbone, Marionette) {
 
-    var oldCollection = Backbone.Collection;
-    Backbone.Collection = function() {
-        var options = arguments[arguments.length - 1];
-        var resolution = /^resolve\:\:([a-zA-Z0-9\-]+)$/.exec(this.model);
-        if (resolution && resolution[1]) {
-            this.model = options.injector.resolveProvider(resolution[1]);
-        }
-        return oldCollection.apply(this, arguments);
-    };
+    function makeClassResolveStringAware(constructorFunction) {
 
-    Backbone.Collection.prototype = oldCollection.prototype;
-    Backbone.Collection.extend = oldCollection.extend;
+        var originalConstructorFunction = constructorFunction;
+        constructorFunction = function() {
 
+            this.injector = arguments[arguments.length - 1].injector;
 
-    oldCompositeView = Marionette.CompositeView;
-    var SeloinCompositeView = oldCompositeView.extend({
-        getChildView: function() {
-            var childView = this.getOption('childView');
+            var propertiesToCheck = ['model', 'childView', 'template'];
+            for (var i in propertiesToCheck) {
+                var prop = propertiesToCheck[i];
 
-            var options = this.options;
-            var resolution = /^resolve\:\:([a-zA-Z0-9\-]+)$/.exec(childView);
-            if (resolution && resolution[1]) {
-                this.childView = options.injector.resolveProvider(resolution[1]);
+                if (typeof this[prop] === 'string') {
+                    var resolution = /^resolve\:\:([a-zA-Z0-9\-]+)$/.exec(this[prop]);
+                    if (resolution && resolution[1]) {
+                        this[prop] = this.injector.resolveProvider(resolution[1]);
+                    }
+                }
             }
 
-            return oldCompositeView.prototype.getChildView.apply(this, arguments);
-        }
-    });
+            return originalConstructorFunction.apply(this, arguments);
+        };
 
-    Marionette.CompositeView = SeloinCompositeView;
+        constructorFunction.prototype = originalConstructorFunction.prototype;
+        constructorFunction.extend = originalConstructorFunction.extend;
+
+        return constructorFunction;
+    }
+
+    Backbone.Collection = makeClassResolveStringAware(Backbone.Collection);
+    Marionette.CompositeView = makeClassResolveStringAware(Marionette.CompositeView);
+    Marionette.ItemView = makeClassResolveStringAware(Marionette.ItemView);
 
 
     function BackboneResolver() {}
@@ -81,6 +82,10 @@ define(['backbone', 'backbone.marionette'], function (Backbone, Marionette) {
         },
 
         static(injector, instance) {
+            return instance;
+        },
+
+        autoInjectedStatic(injector, instance) {
             return instance;
         }
     };

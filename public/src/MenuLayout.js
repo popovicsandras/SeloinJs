@@ -1,7 +1,7 @@
-define(['backbone.marionette', 'text!templates/MenuLayout.html'], function (Marionette, template) {
+define(['backbone.marionette'], function (Marionette) {
 
     var MenuLayoutView = Marionette.LayoutView.extend({
-        template: template
+        template: 'resolve::MenuLayoutTemplate'
     });
 
     return MenuLayoutView;
