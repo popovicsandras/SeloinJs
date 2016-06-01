@@ -551,24 +551,22 @@ describe('Injector container', function (){
             };
         });
 
-        describe('wihtout config object parameter', function () {
+        describe('without config object parameter', function () {
 
             it('should register the factories of configObject', function () {
 
                 const injector = new Injector();
-                configObject.factory = {
-                    'TestClass': TestClass,
-                    'TestClass2': TestClass2
-                };
-                injector.config(configObject);
+                injector.config({
+                    factory: {
+                        'TestClass': TestClass,
+                        'TestClass2': TestClass2
+                    }
+                });
 
                 injector.initScope();
 
-                const test = injector.resolve('TestClass'),
-                    test2 = injector.resolve('TestClass2');
-
-                expect(test).to.be.an.instanceOf(TestClass);
-                expect(test2).to.be.an.instanceOf(TestClass2);
+                expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
+                expect(injector.resolve('TestClass2')).to.be.an.instanceOf(TestClass2);
             });
 
             it('should register the functions of configObject', function () {
@@ -638,28 +636,63 @@ describe('Injector container', function (){
             });
         });
 
-        describe.skip('with config object', function () {
+        describe('with config object', function () {
 
-            class TestClassOveridden {}
+            let defaultConfigObject;
 
-            it('should register the factories of passed defaultConfigObject which are not in the "config:scopename" object', function () {
-
-                const injector = new Injector();
-                configObject.factory = {
-                    'TestClass': TestClass,
-                    'TestClass2': TestClass2
+            beforeEach(function() {
+                defaultConfigObject = {
+                    factory: {},
+                    function: {},
+                    static: {},
+                    config: {}
                 };
-                injector.config(configObject);
-
-                injector.initScope();
-
-                const test = injector.resolve('TestClass'),
-                    test2 = injector.resolve('TestClass2');
-
-                expect(test).to.be.an.instanceOf(TestClass);
-                expect(test2).to.be.an.instanceOf(TestClass2);
             });
 
+            describe('factories', function () {
+
+                class TestClassOveridden {}
+
+                it('should register the factories of passed defaultConfigObject and "config:scopename" object with the right priority', function () {
+
+                    const injector = new Injector();
+                    configObject.factory = {
+                        'TestClass': TestClassOveridden
+                    };
+                    defaultConfigObject.factory = {
+                        'TestClass': TestClass,
+                        'TestClass2': TestClass2
+                    };
+
+                    injector.config(configObject);
+                    injector.initScope(defaultConfigObject);
+
+                    expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClassOveridden);
+                    expect(injector.resolve('TestClass2')).to.be.an.instanceOf(TestClass2);
+                });
+
+                it('should not modify either the defaultConfigObject either the configObject', function () {
+
+                    const injector = new Injector();
+                    configObject.factory = {
+                        'TestClass': TestClassOveridden
+                    };
+                    defaultConfigObject.factory = {
+                        'TestClass2': TestClass2
+                    };
+
+                    injector.config(configObject);
+                    injector.initScope(defaultConfigObject);
+
+                    expect(configObject.factory).to.be.eql({
+                        'TestClass': TestClassOveridden
+                    });
+
+                    expect(defaultConfigObject.factory).to.be.eql({
+                        'TestClass2': TestClass2
+                    });
+                });
+            });
         });
     });
 
