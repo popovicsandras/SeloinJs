@@ -12,7 +12,6 @@ class TestClass {
 }
 
 class TestClass2 {}
-class TestClass3 {}
 
 describe('Injector container', function (){
 
@@ -551,9 +550,9 @@ describe('Injector container', function (){
             };
         });
 
-        describe('without config object parameter', function () {
+        describe('without defaultConfigObject parameter', function () {
 
-            it('should register the factories of configObject', function () {
+            it('should register the factories of scope\'s configObject', function () {
 
                 const injector = new Injector();
                 injector.config({
@@ -569,7 +568,7 @@ describe('Injector container', function (){
                 expect(injector.resolve('TestClass2')).to.be.an.instanceOf(TestClass2);
             });
 
-            it('should register the functions of configObject', function () {
+            it('should register the functions of scope\'s configObject', function () {
 
                 const injector = new Injector();
                 configObject.function = {
@@ -587,7 +586,7 @@ describe('Injector container', function (){
                 expect(configObject.function.testFn2).to.have.been.called;
             });
 
-            it('should register the statics of configObject', function () {
+            it('should register the statics of scope\'s configObject', function () {
 
                 const injector = new Injector();
                 configObject.static = {
@@ -605,7 +604,7 @@ describe('Injector container', function (){
                 expect(obj2).to.be.equal(configObject.static.obj2);
             });
 
-            it('should register the configs of configObject', function () {
+            it('should register the configs of scope\'s configObject', function () {
 
                 const injector = new Injector();
                 configObject.config = {
@@ -636,7 +635,7 @@ describe('Injector container', function (){
             });
         });
 
-        describe('with config object', function () {
+        describe('with defaultConfigObject parameter', function () {
 
             let defaultConfigObject;
 
@@ -692,6 +691,106 @@ describe('Injector container', function (){
                         'TestClass2': TestClass2
                     });
                 });
+            });
+
+            describe('functions', function () {
+
+                function func1() { return 1; }
+                function func2() { return 2; }
+                function func3() { return 3; }
+
+                it('should register the functions of passed defaultConfigObject and "config:scopename" object with the right priority', function () {
+
+                    const injector = new Injector();
+                    configObject.function = {
+                        'func1': func3
+                    };
+
+                    defaultConfigObject.function = {
+                        'func1': func1,
+                        'func2': func2
+                    };
+
+                    injector.config(configObject);
+                    injector.initScope(defaultConfigObject);
+
+                    expect(injector.resolve('func1')).to.be.equal(3);
+                    expect(injector.resolve('func2')).to.be.equal(2);
+                });
+
+                it('should not modify either the defaultConfigObject either the configObject', function () {
+
+                    const injector = new Injector();
+                    configObject.function = {
+                        'func1': func3
+                    };
+
+                    defaultConfigObject.function = {
+                        'func2': func2
+                    };
+
+                    injector.config(configObject);
+                    injector.initScope(defaultConfigObject);
+
+                    expect(configObject.function).to.be.eql({
+                        'func1': func3
+                    });
+
+                    expect(defaultConfigObject.function).to.be.eql({
+                        'func2': func2
+                    });
+                });
+            });
+
+            describe('static & config', function () {
+
+                const obj1 = { value: 'foo' },
+                    obj2 = { value: 'bar' },
+                    obj3 = { value: 'baz' };
+
+                given(['static', ''], ['config', 'config:'])
+                    .it('should register the statics|config of passed defaultConfigObject and "config:scopename" object with the right priority', function (serviceType, prefix) {
+
+                        const injector = new Injector();
+                        configObject[serviceType] = {
+                            'obj1': obj3
+                        };
+
+                        defaultConfigObject[serviceType] = {
+                            'obj1': obj1,
+                            'obj2': obj2
+                        };
+
+                        injector.config(configObject);
+                        injector.initScope(defaultConfigObject);
+
+                        expect(injector.resolve(prefix + 'obj1')).to.be.equal(obj3);
+                        expect(injector.resolve(prefix + 'obj2')).to.be.equal(obj2);
+                    });
+
+                given('static', 'config')
+                    .it('should not modify either the defaultConfigObject either the configObject', function (serviceType) {
+
+                        const injector = new Injector();
+                        configObject[serviceType] = {
+                            'obj1': obj3
+                        };
+
+                        defaultConfigObject[serviceType] = {
+                            'obj2': obj2
+                        };
+
+                        injector.config(configObject);
+                        injector.initScope(defaultConfigObject);
+
+                        expect(configObject[serviceType]).to.be.eql({
+                            'obj1': obj3
+                        });
+
+                        expect(defaultConfigObject[serviceType]).to.be.eql({
+                            'obj2': obj2
+                        });
+                    });
             });
         });
     });
