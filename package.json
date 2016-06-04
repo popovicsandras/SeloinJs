@@ -1,10 +1,17 @@
 {
-  "name": "SeloinJs",
-  "version": "0.0.1",
+  "name": "seloin",
+  "version": "0.0.3",
   "description": "Javascript Service Locator Injection library",
+  "repository" :
+  {
+    "type" : "git",
+    "url" : "https://github.com/popovicsandras/SeloinJs.git"
+  },
   "main": "index.js",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
-    "postinstall": "bower install",
     "start": "webpack-dev-server -d --config webpack.dev-server.config.js",
     "build:dev": "webpack -d --config webpack-dev-server.config.js",
     "build": "webpack -p --config webpack.build.config.js",

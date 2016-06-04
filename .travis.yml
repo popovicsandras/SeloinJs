@@ -1,6 +1,4 @@
 language: node_js
-deploy: 
-api_key: 
 node_js:
 - '4.2'
 - '0.11'
@@ -10,3 +8,4 @@ provider: npm
 env:
   global:
     secure: XqUFJ3kjynfk/qwU0vGl63VPG3bH0lcNNhFd3OY7c0B6ZxfUqUeXO0Hhkf6NWA5/gOW96VFv8DI2MDgDGPU6MNX60m4A/Yg8QinCco8Vsjwo6Xd51dXRoe5fP21Jpwl/jnU2cCZ0e4DsKZZISEDyXmtMwSwpPR90hMOdd7CO15QTw8xx0l+Uhbkp4iIkcj1jksOWYSWrIahWc1G6+jOVkXZxTgP0c+yEnyMfi1EnVcCi6Nq4xuUtzU6S8nHg5BdFnFxzarGxDWan0q3MOjS103oBTVE/QKRYA5yRnISxg+8JuqQrc/THES7W8ZmlRXowCjh6O5mmw9WElLiKmuOkbCDrC5fs/XxS3Wb1D913AA3xhn4RKoiZTJjfOkk/jTee3OV2zJOuZ2SOoTDCtoFnxRD8w0XqHK9JfJPjdufsJC4LOykA0P6zgRch1lfaod3gNmgXcAsKxmCb45UOLOZIbuewIxu9FsVdbtnmtxgUqR6ndQzSQGPuvdcHciRpVuodBsz/b1RpnW7wYfj4beR0MHMqrEe1mVfUPs4apPrGLUz33pQofr5+1aZ2M5q/x6VeFLzhn30Z6Jq7krTPFrrWq/4ezcIXmKeGMnQQc/qdNgaTj/oRc+Hq9fp48W3l8MXP6mSxKymb1TL5PmBRGu/qt72Jkci+npeNRuVaVzf3hPc=
+script: npm run build
