@@ -15,7 +15,6 @@ define(function (require) {
             'CharacterListLayoutTemplate': _.template(require('text!CharacterList/templates/CharacterListLayout.html'))
         },
         config: {
-            'original-component': require('CharacterList/characterlist.services'),
             'dragon-ball-characters': require('DragonBallList/db.services')
         }
     };

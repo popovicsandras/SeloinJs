@@ -1,4 +1,4 @@
-define(['backbone.marionette'], function (Marionette) {
+define(['backbone.marionette', '../characterlist.services'], function (Marionette, defaultComponentConfig) {
 
     var TodoLayoutView = Marionette.LayoutView.extend({
 
@@ -6,7 +6,7 @@ define(['backbone.marionette'], function (Marionette) {
 
         initialize: function(options) {
             this.injector = options.injector;
-            this.injector.initScope();
+            this.injector.initScope(defaultComponentConfig);
         },
 
         regions: {

@@ -1,4 +1,4 @@
-define(['backbone.marionette'], function (Marionette) {
+define(['backbone.marionette', 'text!DragonBallList/templates/DragonBallCharacterListLayout.html', 'underscore'], function (Marionette, overriddenTemplate, _) {
 
     var AppLayoutView = Marionette.LayoutView.extend({
 
@@ -19,6 +19,7 @@ define(['backbone.marionette'], function (Marionette) {
             this.original.show(CharacterListLayout);
 
             var dragonBallContainer = this.injector.createChild('dragon-ball-characters');
+            dragonBallContainer.static('CharacterListLayoutTemplate', _.template(overriddenTemplate));
             var DragonBallCharacterListLayout = dragonBallContainer.resolve('CharacterListLayout');
             this.dragonball.show(DragonBallCharacterListLayout);
         }

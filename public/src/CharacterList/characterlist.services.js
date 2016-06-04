@@ -11,7 +11,6 @@ define(function (require) {
             'CharacterModel': require('CharacterList/models/CharacterModel')
         },
         static: {
-            'CharacterListLayoutTemplate': _.template(require('text!CharacterList/templates/CharacterListLayout.html')),
             'CharacterListCollectionTemplate': _.template(require('text!CharacterList/templates/CharacterListCollectionView.html')),
             'CharacterListItemTemplate': _.template(require('text!CharacterList/templates/CharacterListItemView.html')),
             'CharacterSearchTemplate': _.template(require('text!CharacterList/templates/CharacterSearchView.html'))
