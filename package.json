@@ -1,11 +1,11 @@
 {
   "name": "seloin",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Javascript Service Locator Injection library",
   "repository" :
   {
     "type" : "git",
-    "url" : "https://github.com/popovicsandras/SeloinJs.git"
+    "url" : "https://github.com/popovicsandras/seloin.git"
   },
   "main": "index.js",
   "files": [
