@@ -4,7 +4,7 @@ var path = require('path'),
 module.exports = {
     debug: true,
     context: path.resolve('lib'),
-    entry: './package.js',
+    entry: './seloin.js',
     output: {
         path: path.join(__dirname, "build"),
         publicPath: '/',

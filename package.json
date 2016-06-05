@@ -1,6 +1,6 @@
 {
   "name": "seloin",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Javascript Service Locator Injection library",
   "repository" :
   {
@@ -9,7 +9,8 @@
   },
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "lib"
   ],
   "scripts": {
     "start": "webpack-dev-server -d --config webpack.dev-server.config.js",

@@ -1,6 +1,6 @@
 'use strict';
 
-import {Injector, Resolvers} from '../../lib/package';
+import {Injector, Resolvers} from '../../lib/seloin';
 
 class TestClass {
     constructor (injector, str, func, obj) {

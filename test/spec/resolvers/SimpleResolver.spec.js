@@ -1,6 +1,6 @@
 'use strict';
 
-import { default as SimpleResolver } from '../../../lib/resolvers/SimpleResolver';
+import { default as SimpleResolver } from '../../../lib/Resolvers/SimpleResolver';
 
 describe('SimpleResolver', function () {
 
