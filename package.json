@@ -1,21 +1,21 @@
 {
   "name": "seloin",
-  "version": "0.0.5",
+  "version": "0.0.8",
   "description": "Javascript Service Locator Injection library",
   "repository" :
   {
     "type" : "git",
     "url" : "https://github.com/popovicsandras/seloin.git"
   },
-  "main": "index.js",
+  "main": "build/seloin.min.js",
   "files": [
-    "index.js",
+    "build",
     "lib"
   ],
   "scripts": {
     "start": "webpack-dev-server -d --config webpack.dev-server.config.js",
     "build:dev": "webpack -d --config webpack-dev-server.config.js",
-    "build": "webpack -p --config webpack.build.config.js",
+    "build": "webpack --config webpack.build.config.js && webpack -p --config webpack.buildmin.config.js",
     "test": "mocha-webpack"
   },
   "author": "Andras Popovics",

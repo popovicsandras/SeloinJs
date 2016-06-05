@@ -18,6 +18,3 @@ public/bower_components
 .idea/
 .vscode/
 .tmp
-
-# Built
-index.js
