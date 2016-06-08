@@ -10,6 +10,22 @@ Seloin is a **Service Locator** implemented in javascript with automatic locator
 *Service Locator pattern is a type of Dependency Injection technique, with it's own advantages and disadvantages.
 You can read more about Service Locator and other Dependency Injection patterns [here (wikipedia.org)](https://en.wikipedia.org/wiki/Service_locator_pattern) and [here (martinfowler.com)](http://martinfowler.com/articles/injection.html).*
 
+## Table of Contents  
+ * [Guide](#guide)  
+   * [Lifecycle methods](#lifecycle-methods)
+     * [Factory](#factory)
+     * [Function](#function)
+     * [Static](#static-singleton)
+   * [Nested service containers (scopes)](#nested-service-containers-scopes)
+   * [Service locator injection strategies] (#service-locator-injection-strategies)
+     * [Parameter list prepender](#parameter-list-prepender)
+     * [Parameter list appender](#parameter-list-appender)
+     * [Prototype Poisoner](#prototype-poisoner)
+     * [Simple resolver (no injection)](#simple-resolver-no-injection)
+   * [Config files](#config-files)
+   * [Creating reusable components with Seloin](#creating-reusable-components-with-seloin)
+ * [API Reference](#api-reference) 
+
 ## Guide
 
 #### Lifecycle methods
@@ -20,7 +36,7 @@ During resolution of a factory, a new instance of resolved "class" will be retur
 ```javascript
 class Car {
     // injector is autoinserted here by Seloin (optional first parameter)
-    constructor(injecor, color) {
+    constructor(injector, color) {
         const bodyPainter = injector.resolve('CarBodyPainter');
         this.bodyColor = bodyPainter.paint(color);
     }
@@ -85,16 +101,22 @@ const mercedes = childContainer2.resolve('Car');
 ```
 During the resolution of a service, the service is attempted to be resolved first on the current service container, and bubbles up through the parent containers (if exist) until the root container.
 
-#### Different service locator injection strategies
+#### Service locator injection strategies
+To be written
 ##### Parameter list prepender
+To be written
 ##### Parameter list appender
+To be written
 ##### Prototype Poisoner
+To be written
 ##### Simple resolver (no injection)
+To be written
 
 #### Config files
-Todo
+To be written
 
 #### Creating reusable components with Seloin
-Todo
+To be written
 
 ## API Reference
+To be written
