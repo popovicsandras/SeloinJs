@@ -1,10 +1,10 @@
 'use strict';
 
-import {Injector, Resolvers} from '../../lib/seloin';
+import {Container, Resolvers} from '../../lib/seloin';
 
 class TestClass {
-    constructor (injector, str, func, obj) {
-        injector.resolve('TestClass2');
+    constructor (container, str, func, obj) {
+        container.resolve('TestClass2');
         this.str = str;
         this.func = func;
         this.obj = obj;
@@ -19,61 +19,61 @@ describe('Injector container', function (){
 
         describe('scope', function () {
 
-            it('should create injector with "root" scope (name) by default', function () {
+            it('should create container with "root" scope (name) by default', function () {
 
-                const injector = new Injector();
+                const container = new Container();
 
-                expect(injector.scope).to.be.equal('root');
+                expect(container.scope).to.be.equal('root');
             });
 
-            it('should create injector with passed parameter as scope (name) if given', function () {
+            it('should create container with passed parameter as scope (name) if given', function () {
 
-                const injector = new Injector({scope: 'Planet Namek'});
+                const container = new Container({scope: 'Planet Namek'});
 
-                expect(injector.scope).to.be.equal('Planet Namek');
+                expect(container.scope).to.be.equal('Planet Namek');
             });
 
             it('should create the scope property as a readonly property', function () {
-                const injector = new Injector();
+                const container = new Container();
 
-                function setScope() { injector.scope = 'Modified'; }
+                function setScope() { container.scope = 'Modified'; }
 
                 expect(setScope).to.throw();
-                expect(injector.scope).to.be.equal('root');
+                expect(container.scope).to.be.equal('root');
             });
         });
 
         describe('parent', function () {
 
-            it('should create injector with null parent by default', function () {
+            it('should create container with null parent by default', function () {
 
-                const injector = new Injector();
+                const container = new Container();
 
-                expect(injector.parent).to.be.null;
+                expect(container.parent).to.be.null;
             });
 
-            it('should create injector with passed parameter as parent if given', function () {
+            it('should create container with passed parameter as parent if given', function () {
 
                 const parentContainer = {},
-                    injector = new Injector({
+                    container = new Container({
                         scope: 'Planet Namek',
                         parent: parentContainer
                     });
 
-                expect(injector.parent).to.be.equal(parentContainer);
+                expect(container.parent).to.be.equal(parentContainer);
             });
 
             it('should create the parent property as a readonly property', function () {
                 const parentContainer = {},
-                    injector = new Injector({
+                    container = new Container({
                         scope: 'Planet Namek',
                         parent: parentContainer
                     });
 
-                function setParent() { injector.parent = {}; }
+                function setParent() { container.parent = {}; }
 
                 expect(setParent).to.throw();
-                expect(injector.parent).to.be.equal(parentContainer);
+                expect(container.parent).to.be.equal(parentContainer);
             });
         });
     });
@@ -82,25 +82,25 @@ describe('Injector container', function (){
 
         it('should not overwrite an already registered service', function() {
 
-            const injector = new Injector();
+            const container = new Container();
 
-            injector.factory('TestClass', TestClass);
-            injector.factory('TestClass2', TestClass2);
+            container.factory('TestClass', TestClass);
+            container.factory('TestClass2', TestClass2);
             try {
-                injector.factory('TestClass', TestClass2);
+                container.factory('TestClass', TestClass2);
             }
             catch(e) {
-                expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
+                expect(container.resolve('TestClass')).to.be.an.instanceOf(TestClass);
             }
         });
 
         it('should throw an Error if the dependency to be registered is already registered', function() {
 
-            const injector = new Injector();
-            injector.factory('SupaDupaTestClass', TestClass);
+            const container = new Container();
+            container.factory('SupaDupaTestClass', TestClass);
 
             const testFunc = function() {
-                injector.function('SupaDupaTestClass', TestClass2);
+                container.function('SupaDupaTestClass', TestClass2);
             };
 
             expect(testFunc).to.throw(Error, 'Dependency is already registered: SupaDupaTestClass');
@@ -108,10 +108,10 @@ describe('Injector container', function (){
 
         it('should throw an Error if the dependency to be resolved is not registered', function() {
 
-            const injector = new Injector();
+            const container = new Container();
 
             const testFunc = function() {
-                injector.resolve('test');
+                container.resolve('test');
             };
 
             expect(testFunc).to.throw(Error, 'Dependency not found: test');
@@ -123,12 +123,12 @@ describe('Injector container', function (){
 
                 it('should resolve by creating a new instance of given function', function() {
 
-                    const injector = new Injector();
+                    const container = new Container();
 
-                    injector.factory('TestClass', TestClass);
-                    injector.factory('TestClass2', TestClass2);
+                    container.factory('TestClass', TestClass);
+                    container.factory('TestClass2', TestClass2);
 
-                    expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
+                    expect(container.resolve('TestClass')).to.be.an.instanceOf(TestClass);
                 });
 
                 it('should resolve the registered service with additional arguments', function() {
@@ -138,12 +138,12 @@ describe('Injector container', function (){
                         expectedObj = {
                             color: 'super-green'
                         },
-                        injector = new Injector();
+                        container = new Container();
 
-                    injector.factory('TestClass', TestClass);
-                    injector.factory('TestClass2', TestClass2);
+                    container.factory('TestClass', TestClass);
+                    container.factory('TestClass2', TestClass2);
 
-                    const instance = injector.resolve('TestClass', expectedStr, expectedFunc, expectedObj);
+                    const instance = container.resolve('TestClass', expectedStr, expectedFunc, expectedObj);
                     expect(instance.str).to.be.equal(expectedStr);
                     expect(instance.func).to.be.equal(expectedFunc);
                     expect(instance.obj).to.be.equal(expectedObj);
@@ -154,10 +154,10 @@ describe('Injector container', function (){
 
                 it('should resolve by returning the inherited surrogate constructor function', function() {
 
-                    const injector = new Injector();
-                    injector.factory('TestClass2', TestClass2);
+                    const container = new Container();
+                    container.factory('TestClass2', TestClass2);
 
-                    const autoInjectedTestClass2 = injector.resolveProvider('TestClass2');
+                    const autoInjectedTestClass2 = container.resolveProvider('TestClass2');
 
                     expect(new autoInjectedTestClass2()).to.be.an.instanceOf(TestClass2);
                     expect(autoInjectedTestClass2.__origin__).to.be.equal('TestClass2');
@@ -170,11 +170,11 @@ describe('Injector container', function (){
                         expectedObj = {
                             color: 'super-green'
                         },
-                        injector = new Injector();
+                        container = new Container();
 
-                    injector.factory('TestClass', TestClass);
-                    injector.factory('TestClass2', TestClass2);
-                    const autoInjectedTestClass = injector.resolveProvider('TestClass');
+                    container.factory('TestClass', TestClass);
+                    container.factory('TestClass2', TestClass2);
+                    const autoInjectedTestClass = container.resolveProvider('TestClass');
 
                     let instance;
                     function createInstance() {
@@ -196,23 +196,23 @@ describe('Injector container', function (){
                 it('should resolve by simply invoking given function', function() {
 
                     const testFunction = sinon.spy();
-                    const injector = new Injector();
+                    const container = new Container();
 
-                    injector.function('TestFunction', testFunction);
-                    injector.resolve('TestFunction', 1, 2, 3);
+                    container.function('TestFunction', testFunction);
+                    container.resolve('TestFunction', 1, 2, 3);
 
                     expect(testFunction).to.have.been.called;
                 });
 
                 it('should resolve by simply invoking given function with given parameters', function() {
 
-                    const testFunction = function (injector, a, b, c) {
+                    const testFunction = function (container, a, b, c) {
                         return a + b + c;
                     };
-                    const injector = new Injector();
+                    const container = new Container();
 
-                    injector.function('TestFunction', testFunction);
-                    const sum = injector.resolve('TestFunction', 1, 2, 3);
+                    container.function('TestFunction', testFunction);
+                    const sum = container.resolve('TestFunction', 1, 2, 3);
 
                     expect(sum).to.be.equal(6);
                 });
@@ -220,17 +220,17 @@ describe('Injector container', function (){
 
             describe('resolve the function provider', function () {
 
-                it('should have the injector auto injected', function() {
+                it('should have the container auto injected', function() {
 
-                    const testFunction = function (injector, a, b, c) {
-                        injector.resolve('TestClass2');
+                    const testFunction = function (container, a, b, c) {
+                        container.resolve('TestClass2');
                         return a + b + c;
                     };
 
-                    const injector = new Injector();
-                    injector.function('TestFunction', testFunction);
-                    injector.factory('TestClass2', TestClass2);
-                    const testFunctionSurrogate = injector.resolveProvider('TestFunction');
+                    const container = new Container();
+                    container.function('TestFunction', testFunction);
+                    container.factory('TestClass2', TestClass2);
+                    const testFunctionSurrogate = container.resolveProvider('TestFunction');
 
                     let sum;
                     function invoke() {
@@ -248,11 +248,11 @@ describe('Injector container', function (){
 
             it('should resolve the registered instance', function () {
                 const Cache = {cache: 'whatever'},
-                    injector = new Injector();
+                    container = new Container();
 
-                injector.static('Cache', Cache);
+                container.static('Cache', Cache);
 
-                expect(injector.resolve('Cache')).to.be.equal(Cache);
+                expect(container.resolve('Cache')).to.be.equal(Cache);
             });
         });
 
@@ -260,18 +260,18 @@ describe('Injector container', function (){
 
             it('should resolve the registered instance on root', function () {
                 const configObject = {},
-                    injector = new Injector();
+                    container = new Container();
 
-                injector.config(configObject);
+                container.config(configObject);
 
-                expect(injector.resolve('config:root')).to.be.equal(configObject);
+                expect(container.resolve('config:root')).to.be.equal(configObject);
             });
 
             it('should resolve the registered instance on child scope', function () {
                 const configObject = {},
-                    injector = new Injector();
+                    container = new Container();
 
-                const childScope = injector.createChild('child-scope');
+                const childScope = container.createChild('child-scope');
                 childScope.config(configObject);
 
                 expect(childScope.resolve('config:child-scope')).to.be.equal(configObject);
@@ -283,11 +283,11 @@ describe('Injector container', function (){
             it('should resolve the registered named config instance', function () {
 
                 const configObject = {},
-                    injector = new Injector();
+                    container = new Container();
 
-                injector.configScope('my-supa-dupa-scope', configObject);
+                container.configScope('my-supa-dupa-scope', configObject);
 
-                expect(injector.resolve('config:my-supa-dupa-scope')).to.be.equal(configObject);
+                expect(container.resolve('config:my-supa-dupa-scope')).to.be.equal(configObject);
             });
         });
     });
@@ -296,13 +296,13 @@ describe('Injector container', function (){
 
         it('should throw an error if createChild has no scope name', function() {
 
-            const injector = new Injector();
+            const container = new Container();
 
             const createChild = function() {
-                injector.createChild({});
+                container.createChild({});
             };
             const createChildSimple = function() {
-                injector.createChild();
+                container.createChild();
             };
 
 
@@ -312,13 +312,13 @@ describe('Injector container', function (){
 
         it('should throw an error if createChild\'s scope name is empty string', function() {
 
-            const injector = new Injector();
+            const container = new Container();
 
             const createChild = function() {
-                injector.createChild({scope: ''});
+                container.createChild({scope: ''});
             };
             const createChildSimple = function() {
-                injector.createChild('');
+                container.createChild('');
             };
 
             expect(createChild).to.throw(`Scope name can't be empty`);
@@ -330,10 +330,10 @@ describe('Injector container', function (){
             let childScopeFromObject,
                 childScopeSimple;
 
-            const injector = new Injector();
+            const container = new Container();
 
-            childScopeFromObject = injector.createChild({scope: 'scope-name-from-options-object'});
-            childScopeSimple = injector.createChild('scope-name-from-string');
+            childScopeFromObject = container.createChild({scope: 'scope-name-from-options-object'});
+            childScopeSimple = container.createChild('scope-name-from-string');
 
             expect(childScopeFromObject.scope).to.be.equal('scope-name-from-options-object');
             expect(childScopeSimple.scope).to.be.equal('scope-name-from-string');
@@ -341,44 +341,44 @@ describe('Injector container', function (){
 
         it('should use the parent\'s resolver by default', function () {
 
-            const injector = new Injector();
+            const container = new Container();
 
-            const childScopeSimple = injector.createChild({
+            const childScopeSimple = container.createChild({
                 scope: 'scope-name-from-string'
             });
 
-            expect(childScopeSimple.resolver).to.be.equal(injector.resolver);
+            expect(childScopeSimple.resolver).to.be.equal(container.resolver);
         });
 
         it('should set the passed resolver for the new child scope', function () {
 
-            const injector = new Injector();
+            const container = new Container();
             const resolver = new Resolvers.ParamListAppender();
 
-            const childScopeFromObject = injector.createChild({
+            const childScopeFromObject = container.createChild({
                 scope: 'scope-name-from-options-object',
                 resolver: resolver
             });
 
-            expect(childScopeFromObject.resolver).to.be.not.equal(injector.resolver);
+            expect(childScopeFromObject.resolver).to.be.not.equal(container.resolver);
             expect(childScopeFromObject.resolver).to.be.equal(resolver);
         });
 
         it('should use the passed resolver for the new child scope', function () {
 
             class TestForOverriddenResolver {
-                constructor(param1, injector) {
-                    injector.resolve('TestClass');
+                constructor(param1, container) {
+                    container.resolve('TestClass');
                     this.param1 = param1;
                 }
             }
 
             let test;
-            const injector = new Injector();
-            injector.factory('TestForOverriddenResolver', TestForOverriddenResolver);
-            injector.factory('TestClass', TestClass);
-            injector.factory('TestClass2', TestClass2);
-            const childScopeFromObject = injector.createChild({
+            const container = new Container();
+            container.factory('TestForOverriddenResolver', TestForOverriddenResolver);
+            container.factory('TestClass', TestClass);
+            container.factory('TestClass2', TestClass2);
+            const childScopeFromObject = container.createChild({
                 scope: 'whatever',
                 resolver: new Resolvers.ParamListAppender()
             });
@@ -391,29 +391,29 @@ describe('Injector container', function (){
             expect(test.param1).to.be.equal('param1');
         });
 
-        it('should create a new level in injector chain', function() {
+        it('should create a new level in container chain', function() {
 
             class App {
-                constructor(injector) {
-                    this.level1 = injector.resolve('Level1');
+                constructor(container) {
+                    this.level1 = container.resolve('Level1');
                 }
             }
 
             class Level1 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createChild('level2');
-                    injector.factory('TestClass', TestClass2);
+                    const container = rootInjector.createChild('level2');
+                    container.factory('TestClass', TestClass2);
 
-                    this.test = injector.resolve('TestClass');
+                    this.test = container.resolve('TestClass');
                 }
             }
 
-            const injector = new Injector();
-            injector.factory('App', App);
-            injector.factory('Level1', Level1);
-            injector.factory('TestClass', TestClass);
+            const container = new Container();
+            container.factory('App', App);
+            container.factory('Level1', Level1);
+            container.factory('TestClass', TestClass);
 
-            const app = injector.resolve('App');
+            const app = container.resolve('App');
 
             expect(app.level1.test).to.be.instanceOf(TestClass2);
         });
@@ -421,35 +421,35 @@ describe('Injector container', function (){
         it('should try to resolve in parent\'s container if service is not present in the current one', function() {
 
             class App {
-                constructor(injector) {
-                    this.level1 = injector.resolve('Level1');
+                constructor(container) {
+                    this.level1 = container.resolve('Level1');
                 }
             }
 
             class Level1 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createChild('whatever');
-                    injector.factory('ServiceFromLevel1', TestClass2);
-                    this.level2 = injector.resolve('Level2');
+                    const container = rootInjector.createChild('whatever');
+                    container.factory('ServiceFromLevel1', TestClass2);
+                    this.level2 = container.resolve('Level2');
                 }
             }
 
             class Level2 {
                 constructor(rootInjector) {
-                    const injector = rootInjector.createChild('whatever2');
-                    this.test = injector.resolve('TestClass');
-                    this.test2 = injector.resolve('ServiceFromLevel1');
+                    const container = rootInjector.createChild('whatever2');
+                    this.test = container.resolve('TestClass');
+                    this.test2 = container.resolve('ServiceFromLevel1');
                 }
             }
 
-            const injector = new Injector();
-            injector.factory('App', App);
-            injector.factory('Level1', Level1);
-            injector.factory('Level2', Level2);
-            injector.factory('TestClass', TestClass);
-            injector.factory('TestClass2', TestClass2);
+            const container = new Container();
+            container.factory('App', App);
+            container.factory('Level1', Level1);
+            container.factory('Level2', Level2);
+            container.factory('TestClass', TestClass);
+            container.factory('TestClass2', TestClass2);
 
-            const app = injector.resolve('App');
+            const app = container.resolve('App');
 
             expect(app.level1.level2.test).to.be.instanceOf(TestClass);
             expect(app.level1.level2.test2).to.be.instanceOf(TestClass2);
@@ -459,65 +459,65 @@ describe('Injector container', function (){
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createChild('level1');
-                    this.level1 = this.injector.resolve('Level1');
+                    this.container = rootInjector.createChild('level1');
+                    this.level1 = this.container.resolve('Level1');
                 }
             }
 
             class Level1 {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createChild('level2');
+                    this.container = rootInjector.createChild('level2');
                 }
             }
 
-            const injector = new Injector();
-            injector.factory('App', App);
-            injector.factory('Level1', Level1);
-            injector.factory('TestClass', TestClass);
+            const container = new Container();
+            container.factory('App', App);
+            container.factory('Level1', Level1);
+            container.factory('TestClass', TestClass);
 
-            const app = injector.resolve('App');
+            const app = container.resolve('App');
 
-            expect(injector.scope).to.be.equal('root');
-            expect(app.injector.scope).to.be.equal('level1');
-            expect(app.level1.injector.scope).to.be.equal('level2');
+            expect(container.scope).to.be.equal('root');
+            expect(app.container.scope).to.be.equal('level1');
+            expect(app.level1.container.scope).to.be.equal('level2');
         });
 
         it('should set scope as a readonly property', function() {
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createChild('original');
+                    this.container = rootInjector.createChild('original');
                 }
             }
 
-            const injector = new Injector();
-            injector.factory('App', App);
+            const container = new Container();
+            container.factory('App', App);
 
-            const app = injector.resolve('App');
+            const app = container.resolve('App');
 
             const setScope = function() {
-                app.injector.scope = 'modified'
+                app.container.scope = 'modified'
             };
 
             expect(setScope).to.throw();
-            expect(app.injector.scope).to.be.equal('original');
+            expect(app.container.scope).to.be.equal('original');
         });
 
         it('should set parent as a readonly property', function() {
 
             class App {
                 constructor(rootInjector) {
-                    this.injector = rootInjector.createChild('scope1');
+                    this.container = rootInjector.createChild('scope1');
                 }
             }
 
-            const injector = new Injector();
-            injector.factory('App', App);
+            const container = new Container();
+            container.factory('App', App);
 
-            const app = injector.resolve('App');
+            const app = container.resolve('App');
 
             const setParent = function() {
-                app.injector.parent = {}
+                app.container.parent = {}
             };
 
             expect(setParent).to.throw();
@@ -527,11 +527,11 @@ describe('Injector container', function (){
     describe('reset', function() {
 
         it('should reset the container\'s registered providers', function () {
-            const injector = new Injector();
-            injector.factory('test', TestClass);
-            const testFunc = function () { injector.resolve('test'); };
+            const container = new Container();
+            container.factory('test', TestClass);
+            const testFunc = function () { container.resolve('test'); };
 
-            injector.reset();
+            container.reset();
 
             expect(testFunc).to.throw(Error, 'Dependency not found: test');
         });
@@ -554,33 +554,33 @@ describe('Injector container', function (){
 
             it('should register the factories of scope\'s configObject', function () {
 
-                const injector = new Injector();
-                injector.config({
+                const container = new Container();
+                container.config({
                     factory: {
                         'TestClass': TestClass,
                         'TestClass2': TestClass2
                     }
                 });
 
-                injector.initScope();
+                container.initScope();
 
-                expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClass);
-                expect(injector.resolve('TestClass2')).to.be.an.instanceOf(TestClass2);
+                expect(container.resolve('TestClass')).to.be.an.instanceOf(TestClass);
+                expect(container.resolve('TestClass2')).to.be.an.instanceOf(TestClass2);
             });
 
             it('should register the functions of scope\'s configObject', function () {
 
-                const injector = new Injector();
+                const container = new Container();
                 configObject.function = {
                     'testFn': sinon.spy(),
                     'testFn2': sinon.spy()
                 };
-                injector.config(configObject);
+                container.config(configObject);
 
-                injector.initScope();
+                container.initScope();
 
-                injector.resolve('testFn');
-                injector.resolve('testFn2');
+                container.resolve('testFn');
+                container.resolve('testFn2');
 
                 expect(configObject.function.testFn).to.have.been.called;
                 expect(configObject.function.testFn2).to.have.been.called;
@@ -588,17 +588,17 @@ describe('Injector container', function (){
 
             it('should register the statics of scope\'s configObject', function () {
 
-                const injector = new Injector();
+                const container = new Container();
                 configObject.static = {
                     'obj1': {foo: 'bar'},
                     'obj2': {foo: 'baz'}
                 };
-                injector.config(configObject);
+                container.config(configObject);
 
-                injector.initScope();
+                container.initScope();
 
-                const obj1 = injector.resolve('obj1'),
-                    obj2 = injector.resolve('obj2');
+                const obj1 = container.resolve('obj1'),
+                    obj2 = container.resolve('obj2');
 
                 expect(obj1).to.be.equal(configObject.static.obj1);
                 expect(obj2).to.be.equal(configObject.static.obj2);
@@ -606,17 +606,17 @@ describe('Injector container', function (){
 
             it('should register the configs of scope\'s configObject', function () {
 
-                const injector = new Injector();
+                const container = new Container();
                 configObject.config = {
                     'scopeName1': {/* a valid config file goes here */},
                     'scopeName2': {/* a valid config file goes here */}
                 };
-                injector.config(configObject);
+                container.config(configObject);
 
-                injector.initScope();
+                container.initScope();
 
-                const scopeName1Config = injector.resolve('config:scopeName1'),
-                    scopeName2Config = injector.resolve('config:scopeName2');
+                const scopeName1Config = container.resolve('config:scopeName1'),
+                    scopeName2Config = container.resolve('config:scopeName2');
 
                 expect(scopeName1Config).to.be.equal(configObject.config.scopeName1);
                 expect(scopeName2Config).to.be.equal(configObject.config.scopeName2);
@@ -624,14 +624,14 @@ describe('Injector container', function (){
 
             it('should do nothing if there is no configuration object registered to the current scope', function () {
 
-                const injector = new Injector();
+                const container = new Container();
 
                 function initScope() {
-                    injector.initScope();
+                    container.initScope();
                 }
 
                 expect(initScope).to.not.throw();
-                expect(injector.services.size).to.be.equal(0);
+                expect(container.services.size).to.be.equal(0);
             });
         });
 
@@ -654,7 +654,7 @@ describe('Injector container', function (){
 
                 it('should register the factories of passed defaultConfigObject and "config:scopename" object with the right priority', function () {
 
-                    const injector = new Injector();
+                    const container = new Container();
                     configObject.factory = {
                         'TestClass': TestClassOveridden
                     };
@@ -663,16 +663,16 @@ describe('Injector container', function (){
                         'TestClass2': TestClass2
                     };
 
-                    injector.config(configObject);
-                    injector.initScope(defaultConfigObject);
+                    container.config(configObject);
+                    container.initScope(defaultConfigObject);
 
-                    expect(injector.resolve('TestClass')).to.be.an.instanceOf(TestClassOveridden);
-                    expect(injector.resolve('TestClass2')).to.be.an.instanceOf(TestClass2);
+                    expect(container.resolve('TestClass')).to.be.an.instanceOf(TestClassOveridden);
+                    expect(container.resolve('TestClass2')).to.be.an.instanceOf(TestClass2);
                 });
 
                 it('should not modify either the defaultConfigObject either the configObject', function () {
 
-                    const injector = new Injector();
+                    const container = new Container();
                     configObject.factory = {
                         'TestClass': TestClassOveridden
                     };
@@ -680,8 +680,8 @@ describe('Injector container', function (){
                         'TestClass2': TestClass2
                     };
 
-                    injector.config(configObject);
-                    injector.initScope(defaultConfigObject);
+                    container.config(configObject);
+                    container.initScope(defaultConfigObject);
 
                     expect(configObject.factory).to.be.eql({
                         'TestClass': TestClassOveridden
@@ -701,7 +701,7 @@ describe('Injector container', function (){
 
                 it('should register the functions of passed defaultConfigObject and "config:scopename" object with the right priority', function () {
 
-                    const injector = new Injector();
+                    const container = new Container();
                     configObject.function = {
                         'func1': func3
                     };
@@ -711,16 +711,16 @@ describe('Injector container', function (){
                         'func2': func2
                     };
 
-                    injector.config(configObject);
-                    injector.initScope(defaultConfigObject);
+                    container.config(configObject);
+                    container.initScope(defaultConfigObject);
 
-                    expect(injector.resolve('func1')).to.be.equal(3);
-                    expect(injector.resolve('func2')).to.be.equal(2);
+                    expect(container.resolve('func1')).to.be.equal(3);
+                    expect(container.resolve('func2')).to.be.equal(2);
                 });
 
                 it('should not modify either the defaultConfigObject either the configObject', function () {
 
-                    const injector = new Injector();
+                    const container = new Container();
                     configObject.function = {
                         'func1': func3
                     };
@@ -729,8 +729,8 @@ describe('Injector container', function (){
                         'func2': func2
                     };
 
-                    injector.config(configObject);
-                    injector.initScope(defaultConfigObject);
+                    container.config(configObject);
+                    container.initScope(defaultConfigObject);
 
                     expect(configObject.function).to.be.eql({
                         'func1': func3
@@ -751,7 +751,7 @@ describe('Injector container', function (){
                 given(['static', ''], ['config', 'config:'])
                     .it('should register the statics|config of passed defaultConfigObject and "config:scopename" object with the right priority', function (serviceType, prefix) {
 
-                        const injector = new Injector();
+                        const container = new Container();
                         configObject[serviceType] = {
                             'obj1': obj3
                         };
@@ -761,17 +761,17 @@ describe('Injector container', function (){
                             'obj2': obj2
                         };
 
-                        injector.config(configObject);
-                        injector.initScope(defaultConfigObject);
+                        container.config(configObject);
+                        container.initScope(defaultConfigObject);
 
-                        expect(injector.resolve(prefix + 'obj1')).to.be.equal(obj3);
-                        expect(injector.resolve(prefix + 'obj2')).to.be.equal(obj2);
+                        expect(container.resolve(prefix + 'obj1')).to.be.equal(obj3);
+                        expect(container.resolve(prefix + 'obj2')).to.be.equal(obj2);
                     });
 
                 given('static', 'config')
                     .it('should not modify either the defaultConfigObject either the configObject', function (serviceType) {
 
-                        const injector = new Injector();
+                        const container = new Container();
                         configObject[serviceType] = {
                             'obj1': obj3
                         };
@@ -780,8 +780,8 @@ describe('Injector container', function (){
                             'obj2': obj2
                         };
 
-                        injector.config(configObject);
-                        injector.initScope(defaultConfigObject);
+                        container.config(configObject);
+                        container.initScope(defaultConfigObject);
 
                         expect(configObject[serviceType]).to.be.eql({
                             'obj1': obj3
@@ -799,29 +799,29 @@ describe('Injector container', function (){
 
         describe('SimpleResolver and factory resolution', function () {
 
-            let injector;
+            let container;
 
             beforeEach(function() {
-                injector = new Injector({
+                container = new Container({
                     resolver: new Resolvers.SimpleResolver()
                 });
-                injector.factory('TestClass', TestClass);
+                container.factory('TestClass', TestClass);
             });
 
-            it('should inject the injector to the end of constructor\'s parameter list', function() {
+            it('should inject the container to the end of constructor\'s parameter list', function() {
 
                 class App {
                     constructor(param1, param2) {
-                        if (this.injector || arguments.length > 2) {
+                        if (this.container || arguments.length > 2) {
                             throw new Error('');
                         }
                     }
                 }
-                injector.factory('App', App);
+                container.factory('App', App);
 
                 let app;
                 function start() {
-                    app = injector.resolve('App', 'param1', 'param2');
+                    app = container.resolve('App', 'param1', 'param2');
                 }
 
                 expect(start).to.not.throw();
@@ -833,33 +833,33 @@ describe('Injector container', function (){
             it('should resolve the static instance', function() {
 
                 const testObj = {foo: 'bar'};
-                const injector = new Injector();
-                injector.static('mySupaInstance', testObj);
+                const container = new Container();
+                container.static('mySupaInstance', testObj);
 
-                const result = injector.resolve('mySupaInstance');
+                const result = container.resolve('mySupaInstance');
                 expect(result).to.be.equal(testObj);
             });
         });
 
         describe('ParamListPrepender and function resolution', function () {
 
-            const testFunction = function(injector, str, obj) {
+            const testFunction = function(container, str, obj) {
                 return {
-                    injector: injector,
+                    container: container,
                     str: str,
                     obj: obj
                 }
             };
 
-            it('should resolve the function with injecting the injector as first parameter', function() {
+            it('should resolve the function with injecting the container as first parameter', function() {
 
                 const dummyStr = 'testString',
                     dummyObj = {foo: 'bar'};
 
-                const injector = new Injector();
-                injector.function('testFunction', testFunction);
+                const container = new Container();
+                container.function('testFunction', testFunction);
 
-                const result = injector.resolve('testFunction', dummyStr, dummyObj);
+                const result = container.resolve('testFunction', dummyStr, dummyObj);
                 expect(result.str).to.be.equal(dummyStr);
                 expect(result.obj).to.be.equal(dummyObj);
             });
@@ -867,27 +867,27 @@ describe('Injector container', function (){
 
         describe('ParamListAppender and factory resolution', function () {
 
-            let injector;
+            let container;
 
             beforeEach(function() {
-                injector = new Injector({
+                container = new Container({
                     resolver: new Resolvers.ParamListAppender()
                 });
-                injector.factory('TestClass', TestClass);
-                injector.factory('TestClass2', TestClass2);
+                container.factory('TestClass', TestClass);
+                container.factory('TestClass2', TestClass2);
             });
 
-            it('should inject the injector to the end of constructor\'s parameter list', function() {
+            it('should inject the container to the end of constructor\'s parameter list', function() {
 
                 class App {
                     constructor() {
-                        const injector = arguments[arguments.length - 1];
-                        this.test = injector.resolve('TestClass');
+                        const container = arguments[arguments.length - 1];
+                        this.test = container.resolve('TestClass');
                     }
                 }
-                injector.factory('App', App);
+                container.factory('App', App);
 
-                const app = injector.resolve('App');
+                const app = container.resolve('App');
 
                 expect(app.test).to.be.an.instanceOf(TestClass);
             });
@@ -898,7 +898,7 @@ describe('Injector container', function (){
             let services;
 
             beforeEach(function() {
-                services = new Injector({
+                services = new Container({
                     resolver: new Resolvers.PrototypePoisoner('services')
                 });
             });
@@ -936,8 +936,8 @@ describe('Injector container', function (){
             it('should work fine', function () {
 
                 class App {
-                    constructor(injector, param1) {
-                        const reusableComponentScope = injector.createChild({
+                    constructor(container, param1) {
+                        const reusableComponentScope = container.createChild({
                             scope: 'reusable-component',
                             resolver: new Resolvers.ParamListAppender()
                         });
@@ -947,12 +947,12 @@ describe('Injector container', function (){
 
                 class ReusableComponent {
                     constructor(param1) {
-                        const injector = arguments[arguments.length-1];
-                        injector.initScope();
-                        this.dependency = injector.resolve('ReusableComponentsDependencyFactory');
-                        this.appWideGlobalInstance = injector.resolve('AppWideGlobalInstance');
+                        const container = arguments[arguments.length-1];
+                        container.initScope();
+                        this.dependency = container.resolve('ReusableComponentsDependencyFactory');
+                        this.appWideGlobalInstance = container.resolve('AppWideGlobalInstance');
                         this.param1 = param1;
-                        injector.resolve('ReusableComponentsDependencyFunction');
+                        container.resolve('ReusableComponentsDependencyFunction');
                     }
                 }
 
@@ -979,12 +979,12 @@ describe('Injector container', function (){
                 };
 
                 let app;
-                const injector = new Injector();
-                injector.config(appConfig);
-                injector.initScope();
+                const container = new Container();
+                container.config(appConfig);
+                container.initScope();
 
                 function start() {
-                    app = injector.resolve('App', 'test param');
+                    app = container.resolve('App', 'test param');
                 }
 
                 expect(start).to.not.throw();
