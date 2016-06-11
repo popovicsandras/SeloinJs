@@ -8,18 +8,22 @@ describe('SimpleResolver', function () {
     let simpleResolver,
         appInstance;
 
+    class AppClassDecl {
+        constructor(param1, param2) {
+            this.param1 = param1;
+            this.param2 = param2;
+        }
+    }
+
+    const testFunction = function(a, b) {
+        return a + b;
+    };
+
     beforeEach(function() {
         simpleResolver = new SimpleResolver();
     });
 
     describe('Factory', function () {
-
-        class AppClassDecl {
-            constructor(param1, param2) {
-                this.param1 = param1;
-                this.param2 = param2;
-            }
-        }
 
         it('should just create the proper instance of passed class without injection', function() {
 
@@ -30,11 +34,17 @@ describe('SimpleResolver', function () {
         });
     });
 
-    describe('Function', function () {
+    describe('autoInjectedFactory', function () {
 
-        const testFunction = function(a, b) {
-            return a + b;
-        };
+        it('should just simply return the given factory', function() {
+
+            const AppClassDeclProvider = simpleResolver.autoInjectedFactory(injector, AppClassDecl, 'AppClassDecl');
+
+            expect(AppClassDeclProvider).to.be.equal(AppClassDecl);
+        });
+    });
+
+    describe('Function', function () {
 
         it('should just call the passed function without injection', function() {
 
@@ -43,6 +53,17 @@ describe('SimpleResolver', function () {
             expect(result).to.be.equal(7);
         });
     });
+
+    describe('autoInjectedFunction', function () {
+
+        it('should just simply return the given function', function() {
+
+            const testFunctionProvider = simpleResolver.autoInjectedFunction(injector, testFunction, 'testFunction');
+
+            expect(testFunctionProvider).to.be.equal(testFunction);
+        });
+    });
+
 
     describe('Static', function () {
 
