@@ -13,7 +13,7 @@
         require(['seloin', 'backbone.seloin', 'backbone.marionette', 'bootstrap'], function (Seloin, BackboneResolver) {
             require(['app.services'], function (appConfig) {
 
-                var rootInjector = new Seloin.Injector({
+                var rootInjector = new Seloin.Container({
                     resolver: new BackboneResolver()
                 });
 
