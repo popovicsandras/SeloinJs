@@ -82,7 +82,9 @@ describe('Injector container', function (){
 
         it('should not overwrite an already registered service', function() {
 
-            const container = new Container();
+            const container = new Container({
+                resolver: new Resolvers.ParamListPrepender()
+            });
 
             container.factory('TestClass', TestClass);
             container.factory('TestClass2', TestClass2);
@@ -123,7 +125,9 @@ describe('Injector container', function (){
 
                 it('should resolve by creating a new instance of given function', function() {
 
-                    const container = new Container();
+                    const container = new Container({
+                        resolver: new Resolvers.ParamListPrepender()
+                    });
 
                     container.factory('TestClass', TestClass);
                     container.factory('TestClass2', TestClass2);
@@ -138,7 +142,9 @@ describe('Injector container', function (){
                         expectedObj = {
                             color: 'super-green'
                         },
-                        container = new Container();
+                        container = new Container({
+                            resolver: new Resolvers.ParamListPrepender()
+                        });
 
                     container.factory('TestClass', TestClass);
                     container.factory('TestClass2', TestClass2);
@@ -154,7 +160,9 @@ describe('Injector container', function (){
 
                 it('should resolve by returning the inherited surrogate constructor function', function() {
 
-                    const container = new Container();
+                    const container = new Container({
+                        resolver: new Resolvers.ParamListPrepender()
+                    });
                     container.factory('TestClass2', TestClass2);
 
                     const autoInjectedTestClass2 = container.resolveProvider('TestClass2');
@@ -170,7 +178,9 @@ describe('Injector container', function (){
                         expectedObj = {
                             color: 'super-green'
                         },
-                        container = new Container();
+                        container = new Container({
+                            resolver: new Resolvers.ParamListPrepender()
+                        });
 
                     container.factory('TestClass', TestClass);
                     container.factory('TestClass2', TestClass2);
@@ -209,7 +219,9 @@ describe('Injector container', function (){
                     const testFunction = function (container, a, b, c) {
                         return a + b + c;
                     };
-                    const container = new Container();
+                    const container = new Container({
+                        resolver: new Resolvers.ParamListPrepender()
+                    });
 
                     container.function('TestFunction', testFunction);
                     const sum = container.resolve('TestFunction', 1, 2, 3);
@@ -227,7 +239,9 @@ describe('Injector container', function (){
                         return a + b + c;
                     };
 
-                    const container = new Container();
+                    const container = new Container({
+                        resolver: new Resolvers.ParamListPrepender()
+                    });
                     container.function('TestFunction', testFunction);
                     container.factory('TestClass2', TestClass2);
                     const testFunctionSurrogate = container.resolveProvider('TestFunction');
@@ -408,7 +422,9 @@ describe('Injector container', function (){
                 }
             }
 
-            const container = new Container();
+            const container = new Container({
+                resolver: new Resolvers.ParamListPrepender()
+            });
             container.factory('App', App);
             container.factory('Level1', Level1);
             container.factory('TestClass', TestClass);
@@ -442,7 +458,9 @@ describe('Injector container', function (){
                 }
             }
 
-            const container = new Container();
+            const container = new Container({
+                resolver: new Resolvers.ParamListPrepender()
+            });
             container.factory('App', App);
             container.factory('Level1', Level1);
             container.factory('Level2', Level2);
@@ -470,7 +488,9 @@ describe('Injector container', function (){
                 }
             }
 
-            const container = new Container();
+            const container = new Container({
+                resolver: new Resolvers.ParamListPrepender()
+            });
             container.factory('App', App);
             container.factory('Level1', Level1);
             container.factory('TestClass', TestClass);
@@ -490,7 +510,9 @@ describe('Injector container', function (){
                 }
             }
 
-            const container = new Container();
+            const container = new Container({
+                resolver: new Resolvers.ParamListPrepender()
+            });
             container.factory('App', App);
 
             const app = container.resolve('App');
@@ -511,7 +533,9 @@ describe('Injector container', function (){
                 }
             }
 
-            const container = new Container();
+            const container = new Container({
+                resolver: new Resolvers.ParamListPrepender()
+            });
             container.factory('App', App);
 
             const app = container.resolve('App');
@@ -554,7 +578,9 @@ describe('Injector container', function (){
 
             it('should register the factories of scope\'s configObject', function () {
 
-                const container = new Container();
+                const container = new Container({
+                    resolver: new Resolvers.ParamListPrepender()
+                });
                 container.config({
                     factory: {
                         'TestClass': TestClass,
@@ -802,9 +828,7 @@ describe('Injector container', function (){
             let container;
 
             beforeEach(function() {
-                container = new Container({
-                    resolver: new Resolvers.SimpleResolver()
-                });
+                container = new Container();
                 container.factory('TestClass', TestClass);
             });
 
@@ -856,7 +880,9 @@ describe('Injector container', function (){
                 const dummyStr = 'testString',
                     dummyObj = {foo: 'bar'};
 
-                const container = new Container();
+                const container = new Container({
+                    resolver: new Resolvers.ParamListPrepender()
+                });
                 container.function('testFunction', testFunction);
 
                 const result = container.resolve('testFunction', dummyStr, dummyObj);
@@ -979,7 +1005,9 @@ describe('Injector container', function (){
                 };
 
                 let app;
-                const container = new Container();
+                const container = new Container({
+                    resolver: new Resolvers.ParamListPrepender()
+                });
                 container.config(appConfig);
                 container.initScope();
 
