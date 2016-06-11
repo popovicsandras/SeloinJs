@@ -28,6 +28,8 @@ You can read more about Service Locator and other Dependency Injection patterns 
    * [Creating reusable components with Seloin](#creating-reusable-components-with-seloin)
  * [API Reference](#api-reference) 
 
+___
+
 ## Guide
 
 #### Registering and resolving services
@@ -64,7 +66,7 @@ const result = container.resolve('sum', 3, 4);
 ```
 
 ##### Static (singleton)
-During resolution of a static, the registered object/string/number/whatever will be returned. Thus, it can act like a singleton.
+During resolution of a static, the registered object/string/number/chocobo will be returned. Thus, it can act like a singleton.
 
 ```javascript
 const myObject = { foo: 'bar' };
@@ -77,6 +79,7 @@ const myObject2 = container.resolve('myObject');
 // myObject1 === myObject2 === myObject
 ```
 
+<br />
 #### Resolving providers
 In some cases you might need to resolve the originally registered class or function and not the instance or the result of the function. For this reason, you can resolve them with the resolveProvider method.
 
@@ -94,11 +97,13 @@ const sumProvider = container.resolve('sum');
 // sumProvider === sum
 ```
 
+<br />
 #### Using one-level deep service container
 After you created your service container you can have it globally (discouraged) or pass it as a parameter through the resolution, to be able to access it from your classes and functions. [For this type of usage you can see examples below](#simple-resolver-no-injection). 
 
 However Seloin gives you more sophisticated features from creating child containers (scopes) to resolution with auto-injected container. 
 
+<br />
 #### Nested service containers (scopes)
 With Seloin you can create linked service containers (parent <- child), where you can register your services. 
 ```javascript
@@ -121,9 +126,11 @@ const honda = hondaComponent.resolve('Car');
 
 During the resolution of a service, the service is attempted to be resolved first on the current service container, and bubbles up through the parent containers (if exist) until the root container.
 
+<br />
 #### Service locator container injection strategies
 During resolution you have different ways of having your service locator containers auto-injected. By default there is no auto-injection during the resolution.
 
+<br />
 ##### Simple resolver (no injection)
 
 ###### resolve
@@ -159,6 +166,7 @@ const sumProvider = container.resolve('sum');
 // sumProvider === sum
 ```
 
+<br />
 ##### Parameter list prepender
 ###### resolve
 Optionally you can configure the Seloin container to inject the container itself during the resolution of a service by default. One of these auto-injection types is the **parameter list prepender** which injects the container as the first argument of the constructur function.
@@ -216,17 +224,22 @@ const result = sumProvider(3, 4);
 // result === 7
 ```
 
+<br />
 ##### Parameter list appender
 under implementation
 
+<br />
 ##### Prototype Poisoner
 under implementation
 
+<br />
 #### Config files
 To be written
 
+<br />
 #### Creating reusable components with Seloin
 To be written
 
+<br />
 ## API Reference
 To be written
