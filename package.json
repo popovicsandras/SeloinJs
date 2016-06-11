@@ -1,6 +1,6 @@
 {
   "name": "seloin",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Javascript Service Locator Injection library",
   "repository" :
   {
