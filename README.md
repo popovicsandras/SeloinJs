@@ -19,13 +19,15 @@ You can read more about Service Locator and other Dependency Injection patterns 
    * [Resolving providers](#resolving-providers)
    * [Using one-level deep service container](#using-one-level-deep-service-container)
    * [Nested service containers (scopes)](#nested-service-containers-scopes)
+     * [Root container](#root-container)
+     * [Child containers](#child-containers)
+     * [Service shadowing](#service-shadowing)
    * [Service locator container injection strategies](#service-locator-container-injection-strategies)
      * [Simple resolver (no injection)](#simple-resolver-no-injection)
      * [Parameter list prepender](#parameter-list-prepender)
      * [Parameter list appender](#parameter-list-appender)
      * [Prototype Poisoner](#prototype-poisoner)
-   * [Config files](#config-files)
-   * [Creating reusable components with Seloin](#creating-reusable-components-with-seloin)
+   * [Container initialization with config files](#container-initialization-with-config-files)
  * [API Reference](#api-reference) 
 
 ___
@@ -105,7 +107,41 @@ However Seloin gives you more sophisticated features from creating child contain
 
 
 #### Nested service containers (scopes)
-With Seloin you can create linked service containers (parent <- child), where you can register your services. 
+With Seloin you can create linked service containers (parent <- child), where you can register your services. Every service container has 3 options to set:
+
+- **scope**:*string* - the name of the container, "root" by default
+- **parent**:*Container* - the parent container, null by default
+- **resolver**:*Resolver* - the resolving injection strategy, SimpleResolver by default
+
+##### Root container
+When creating a (root) container, you usually don't have to set anything, except if you prefer to use anything other than the default values.
+```javascript
+const container = new Seloin.Container({
+    scope: 'custom-scope-name',
+    resolver: new Seloin.Resolvers.ParamListPrepender()
+});
+```
+##### Child containers
+Creating a (child) container can be done with the **createChild** method. Setting the parent when creating child scopes will be automatically done for you by the **createChild** method. 
+```javascript
+const container = new Seloin.Container({});
+// container.scope === 'root'
+const child = container.createChild('child-scope-name');
+// child.scope === 'child-scope-name'
+// child.parent === container
+```
+
+When you create a child container usually you only have to specify the scope name of the child container (see above). The parent attribute will be automatically linked for you, and the child scope will inherit the resolver from it's parent scope. However you can override the resolver of the child scope, if you don't want it to inherit from it's parent scope.
+```javascript
+const container = new Seloin.Container();
+const child = container.createChild({
+    scope: 'child-scope-name',
+    resolver: new CustomResolver()
+});
+```
+
+##### Service shadowing
+During the resolution of a service, the service is attempted to be resolved first on the current service container, and bubbles up through the parent containers (if exist) until the root container or until the service is found on any of the parent containers. This means a registered 'Car' service on a parent container will be shadowed by any of it's child container 'Car' services, if exists.
 ```javascript
 class JustACar {}
 class Honda {}
@@ -115,7 +151,7 @@ container.factory('Car', JustACar);
 
 const carComponent = container.createChild('carComponent');
 const hondaComponent = container.createChild('hondaComponent');
-// Hide container's Car 
+// Shadows container's Car 
 hondaComponent.factory('Car', Honda);
 
 const car = carComponent.resolve('Car');
@@ -123,9 +159,6 @@ const car = carComponent.resolve('Car');
 const honda = hondaComponent.resolve('Car');
 // honda is instance of Honda, resolved by hondaComponent since hondaComponent has registered Car service on it
 ```
-
-During the resolution of a service, the service is attempted to be resolved first on the current service container, and bubbles up through the parent containers (if exist) until the root container.
-
 
 #### Service locator container injection strategies
 During resolution you have different ways of having your service locator containers auto-injected. By default there is no auto-injection during the resolution.
@@ -194,7 +227,7 @@ const car = container.resolve('Car', 'blue');
 ```
 
 ###### resolveProvider
-Resolving the provider of a registered service having the **Parameter list prepender** as the container's resolver will return a modified auto-injected surrogate class/function. The container is auto-injected as the first Parameter, which means that you don't have to pass the container when you create a new instance / call the function of the returned provider.
+Resolving the provider of a registered service having the **Parameter list prepender** as the container's resolver will return a modified, auto-injected surrogate class/function. For this reason use the resolveProvider method of **Parameter list prepender** carefully, since everytime it creates a new derived class / wrapped function from the original class/function. The container is auto-injected as the first Parameter, which means that you don't have to pass the container when you create a new instance / call the function of the returned provider.
 
 ```javascript
 class Car {
@@ -235,11 +268,7 @@ under implementation
 under implementation
 
 
-#### Config files
-To be written
-
-
-#### Creating reusable components with Seloin
+#### Container initialization with config files
 To be written
 
 
