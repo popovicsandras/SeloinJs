@@ -2,10 +2,9 @@
   "name": "seloin",
   "version": "0.1.2",
   "description": "Yet another javascript Service Locator",
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/popovicsandras/seloin.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/popovicsandras/seloin.git"
   },
   "main": "build/seloin.min.js",
   "files": [
@@ -26,6 +25,10 @@
     "build": "webpack --config webpack.build.config.js && webpack -p --config webpack.buildmin.config.js",
     "test": "mocha-webpack"
   },
+  "pre-commit": [
+    "test",
+    "build"
+  ],
   "author": "Andras Popovics",
   "license": "ISC",
   "devDependencies": {
@@ -42,6 +45,7 @@
     "mocha": "^2.4.5",
     "mocha-testdata": "^1.2.0",
     "mocha-webpack": "^0.3.1",
+    "pre-commit": "^1.1.3",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
     "source-map-support": "^0.4.0",
