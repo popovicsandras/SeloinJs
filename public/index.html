@@ -10,11 +10,11 @@
 
     <script>
         document.currentScript.src ='';
-        require(['seloin', 'backbone.seloin', 'backbone.marionette', 'bootstrap'], function (Seloin, BackboneResolver) {
+        require(['seloin', 'backbone.seloin', 'backbone.marionette', 'bootstrap'], function (Seloin, BackboneInjector) {
             require(['app.services'], function (appConfig) {
 
                 var rootInjector = new Seloin.Container({
-                    resolver: new BackboneResolver()
+                    injector: new BackboneInjector()
                 });
 
                 // Registers the config object to conf:root

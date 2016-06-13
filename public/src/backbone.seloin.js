@@ -33,8 +33,8 @@ define(['backbone', 'backbone.marionette'], function (Backbone, Marionette) {
     Marionette.ItemView = makeClassResolveStringAware(Marionette.ItemView);
 
 
-    function BackboneResolver() {}
-    BackboneResolver.prototype = {
+    function BackboneInjector() {}
+    BackboneInjector.prototype = {
 
         factory: function(injector, Service) {
             var args = Array.prototype.slice.call(arguments, 2);
@@ -90,5 +90,5 @@ define(['backbone', 'backbone.marionette'], function (Backbone, Marionette) {
         }
     };
 
-    return BackboneResolver;
+    return BackboneInjector;
 });
