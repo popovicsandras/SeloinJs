@@ -8,6 +8,10 @@
 $ npm install seloin
 ```
 
+## Inspired by
+- [Boxer@Github](https://github.com/workshare/boxer), [Boxer@npm](https://www.npmjs.com/package/@workshare/boxer)
+- [Backbone dependency injection](https://www.npmjs.com/package/backbone.dependencyinjection)
+
 ## Introduction
 Seloin is a **Service Locator** library implemented in javascript. You can use Seloin in different ways, ranging from having **one global service locator container** only (which is discouraged), to having **hierarchical linked service locator containers** with extra features like optional auto locator injection during the service resolution or config file support.
 
@@ -17,38 +21,35 @@ Seloin is a **Service Locator** library implemented in javascript. You can use S
 You can read more about Service Locator and other Dependency Injection patterns [here (wikipedia.org)](https://en.wikipedia.org/wiki/Service_locator_pattern) and [here (martinfowler.com)](http://martinfowler.com/articles/injection.html).*
 
 ## Table of Contents  
- * [Guide](#guide)  
-   * [Registering and resolving services](#registering-and-resolving-services)
-     * [Factory](#factory)
-     * [Function](#function)
-     * [Static](#static-singleton)
-   * [Resolving providers](#resolving-providers)
-   * [Using one-level deep service container](#using-one-level-deep-service-container)
-   * [Nested service containers (scopes)](#nested-service-containers-scopes)
-     * [Root container](#root-container)
-     * [Child containers](#child-containers)
-     * [Service shadowing](#service-shadowing)
-   * [Service locator container injection strategies](#service-locator-container-injection-strategies)
-     * [No injection](#no-injection)
-     * [Parameter list prepender](#parameter-list-prepender)
-     * [Parameter list appender](#parameter-list-appender)
-     * [Prototype Poisoner](#prototype-poisoner)
-     * [Custom Injection](#custom-injection)
-   * [Container initialization with config objects](#container-initialization-with-config-objects)
-     * [Config objects](#config-objects)
-     * [config](#config)
-     * [initScope](#initscope)
+* [Registering and resolving services](#registering-and-resolving-services)
+    * [Factory](#factory)
+    * [Function](#function)
+    * [Static](#static-singleton)
+* [Resolving providers](#resolving-providers)
+* [Using one-level deep service container](#using-one-level-deep-service-container)
+* [Nested service containers (scopes)](#nested-service-containers-scopes)
+    * [Root container](#root-container)
+    * [Child containers](#child-containers)
+    * [Service shadowing](#service-shadowing)
+* [Service locator container injection strategies](#service-locator-container-injection-strategies)
+    * [No injection](#no-injection)
+    * [Parameter list prepender](#parameter-list-prepender)
+    * [Parameter list appender](#parameter-list-appender)
+    * [Prototype Poisoner](#prototype-poisoner)
+    * [Custom Injection](#custom-injection)
+* [Container initialization with config objects](#container-initialization-with-config-objects)
+    * [Config objects](#config-objects)
+    * [config](#config)
+    * [initScope](#initscope)
 
 ___
 
-## Guide
-
-#### Registering and resolving services
+### Registering and resolving services
 You can define your services as **factory**, **function** or **static** (singleton).
 
 <br />
 
-##### Factory
+#### Factory
 During resolution of a factory, a new instance of resolved "class" will be returned.
 ```javascript
 class Car {
@@ -66,7 +67,7 @@ const redCar = container.resolve('Car', 'red');
 
 <br />
 
-##### Function
+#### Function
 During resolution of a function, the resolved function will be invoked.
 ```javascript
 function sum(a, b) {
@@ -82,7 +83,7 @@ const result = container.resolve('sum', 3, 4);
 
 <br />
 
-##### Static (singleton)
+#### Static (singleton)
 During resolution of a static, the registered object/string/number/chocobo will be returned. Thus, it can act like a singleton.
 
 ```javascript
@@ -98,7 +99,7 @@ const myObject2 = container.resolve('myObject');
 
 <br />
 
-#### Resolving providers
+### Resolving providers
 In some cases you might need to resolve the originally registered class or function and not the instance or the result of the function. For this reason, you can resolve them with the resolveProvider method.
 
 ```javascript
@@ -117,14 +118,14 @@ const sumProvider = container.resolveProvider('sum');
 
 <br />
 
-#### Using one-level deep service container
+### Using one-level deep service container
 After you created your service container you can have it globally (discouraged) or pass it as a parameter through the resolution, to be able to access it from your classes and functions. [For this type of usage you can see examples below](#no-injection). 
 
 However Seloin gives you more sophisticated features from creating child containers (scopes) to resolution with auto-injected container. 
 
 <br />
 
-#### Nested service containers (scopes)
+### Nested service containers (scopes)
 With Seloin you can create linked service containers (parent <- child), where you can register your services. Every service container has 3 options to set:
 
 - **scope**:*string* - the name of the container, "root" by default
@@ -133,7 +134,7 @@ With Seloin you can create linked service containers (parent <- child), where yo
 
 <br />
 
-##### Root container
+#### Root container
 When creating a (root) container, you usually don't have to set anything, except if you prefer to use anything other than the default values.
 ```javascript
 const container = new Seloin.Container({
@@ -144,7 +145,7 @@ const container = new Seloin.Container({
 
 <br />
 
-##### Child containers
+#### Child containers
 Creating a (child) container can be done with the **createChild** method. Setting the parent when creating child scopes will be automatically done for you by the **createChild** method. 
 ```javascript
 const container = new Seloin.Container({});
@@ -165,7 +166,7 @@ const child = container.createChild({
 
 <br />
 
-##### Service shadowing
+#### Service shadowing
 During the resolution of a service, the service is attempted to be resolved first on the current service container, and bubbles up through the parent containers (if exist) until the root container or until the service is found on any of the parent containers. This means a registered 'Car' service on a parent container will be shadowed by any of its child container 'Car' services, if exists.
 ```javascript
 class JustACar {}
@@ -187,14 +188,14 @@ const honda = hondaComponent.resolve('Car');
 
 <br />
 
-#### Service locator container injection strategies
+### Service locator container injection strategies
 During resolution you have different ways of having your service locator containers auto-injected. By default there is no auto-injection during the resolution.
 
 <br />
 
-##### No injection
+#### No injection
 
-###### resolve
+##### resolve
 This is the default injection strategy, which has no injection. If you want to access the service locator container from the resolved entity, you have to pass it during resolution.
 ```javascript
 class Engine {}
@@ -212,7 +213,7 @@ container.factory('Engine', Engine);
 const car = container.resolve('Car', 'blue', container);
 ```
 
-###### resolveProvider
+##### resolveProvider
 With this default injector, resolving the provider just simply returns the originally registered service provider.
 ```javascript
 class Car {}
@@ -230,9 +231,9 @@ const sumProvider = container.resolveProvider('sum');
 
 <br />
 
-##### Parameter list prepender
+#### Parameter list prepender
 
-###### resolve
+##### resolve
 Optionally you can configure the Seloin container to inject the container itself during the resolution of a service by default. One of these auto-injection types is the **parameter list prepender** which injects the container as the first argument of the constructor function.
 
 ```javascript
@@ -255,7 +256,7 @@ container.factory('Engine', Engine);
 const car = container.resolve('Car', 'blue');
 ```
 
-###### resolveProvider
+##### resolveProvider
 Resolving the provider of a registered service having the **Parameter list prepender** as the container's injector will return a modified, auto-injected surrogate class/function. For this reason use the resolveProvider method of **Parameter list prepender** carefully, since every time it creates a new derived class / wrapped function from the original class/function. The container is auto-injected as the first Parameter, which means that you don't have to pass the container when you create a new instance / call the function of the returned provider.
 
 ```javascript
@@ -290,17 +291,17 @@ const result = sumProvider(3, 4);
 
 <br />
 
-##### Parameter list appender
+#### Parameter list appender
 under implementation
 
 <br />
 
-##### Prototype Poisoner
+#### Prototype Poisoner
 under implementation
 
 <br />
 
-##### Custom Injection
+#### Custom Injection
 
 You can create your own type of service container injection strategy if you want to. For example if you have a software design which uses setter dependency injection instead of constructor injection, you can implement that and use it with Seloin.
 
@@ -308,12 +309,12 @@ For working examples, see the code of the already implemented [Injectors](https:
 
 <br />
 
-#### Container initialization with config objects
+### Container initialization with config objects
 Instead of registering your services manually on containers, you can use config objects to wire your application/component. In config objects, you can define your factory, function and static services and other configs for child scopes too. 
 
 <br />
 
-##### Config objects
+#### Config objects
 The syntax of config file and config object are the following:
 ```javascript
 import {SampleFactory, SampleFactory2, SampleFunction, SampleStatic, ChildConfig} from 'Sample';
@@ -337,12 +338,12 @@ var componentConfig = {
 
 <br />
 
-##### config
+#### config
 You can register the configuration object on your container with the **config** method. **Invoking the config method will only register the configuration object you passed in, and not the contents of it.**
 
 When you call the config method on a container the following happens:
 - the name for the configuration object will be computed from the "config:" prefix and the container's name. For example, for a container with the scope name of **"namek"**, this generated config name will be **"config:namek"**.
-- The container registers the passed configuration object on itself with the previously computed name as a static service. *Basically config(configObject) is just a shorthand method for static('config:<scope-name>', configObject).*
+- The container registers the passed configuration object on itself with the previously computed name as a static service. *Basically config(configObject) is just a shorthand method for static('config:scope-name', configObject).*
 
 ```javascript
 import {appConfig} from 'appConfig';
@@ -356,7 +357,7 @@ Now you have the appConfig object registered in you rootContainer under the name
 
 <br />
 
-##### configScope
+#### configScope
 Beside config method, you have the **configScope** method too, which has 2 parameters:
 - name of the scope (usually child scope)
 - config object for the scope
@@ -375,11 +376,11 @@ rootContainer.configScope('supa-dupa-scope', childConfig);
 
 <br />
 
-##### initScope
+#### initScope
 The initScope method takes one parameter, the defaultConfigObject, which is optional.
 
 The initScope method's behaviour is the following:
-- resolve the **configObject** ("config:<scope-name>") for registered configobject, if exists
+- resolve the **configObject** ("config:scope-name") for registered configobject, if exists
 - merge the **defaultConfigObject** with the resolved **configObject**. In case of conflicts (same service names) the resolved **configObject**'s value takes precedence. This way you can always override services from parents as a way of setting dependencies for the child container.
 - parse the merged configobject and load the contents of it to the container. Factories, functions, statics and config objects will be loaded too.
 
