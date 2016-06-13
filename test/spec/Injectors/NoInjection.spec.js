@@ -1,6 +1,6 @@
 'use strict';
 
-import { default as SimpleResolver } from '../../../lib/Resolvers/SimpleResolver';
+import { default as NoInjection } from '../../../lib/Injectors/NoInjection';
 
 describe('SimpleResolver', function () {
 
@@ -20,7 +20,7 @@ describe('SimpleResolver', function () {
     };
 
     beforeEach(function() {
-        simpleResolver = new SimpleResolver();
+        simpleResolver = new NoInjection();
     });
 
     describe('Factory', function () {

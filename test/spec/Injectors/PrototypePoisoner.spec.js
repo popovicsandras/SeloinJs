@@ -1,6 +1,6 @@
 'use strict';
 
-import PrototypePoisoner from '../../../lib/Resolvers/PrototypePoisoner';
+import PrototypePoisoner from '../../../lib/Injectors/PrototypePoisoner';
 
 describe('PrototypePoisoner', function () {
 

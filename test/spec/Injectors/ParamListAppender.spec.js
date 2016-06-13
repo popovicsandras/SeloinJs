@@ -1,6 +1,6 @@
 'use strict';
 
-import { default as ParamListAppender } from '../../../lib/Resolvers/ParamListAppender';
+import { default as ParamListAppender } from '../../../lib/Injectors/ParamListAppender';
 
 describe('ParamListAppender', function () {
 

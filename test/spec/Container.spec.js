@@ -1,6 +1,6 @@
 'use strict';
 
-import {Container, Resolvers} from '../../lib/seloin';
+import {Container, Injectors} from '../../lib/seloin';
 
 class TestClass {
     constructor (container, str, func, obj) {
@@ -83,7 +83,7 @@ describe('Injector container', function (){
         it('should not overwrite an already registered service', function() {
 
             const container = new Container({
-                resolver: new Resolvers.ParamListPrepender()
+                injector: new Injectors.ParamListPrepender()
             });
 
             container.factory('TestClass', TestClass);
@@ -126,7 +126,7 @@ describe('Injector container', function (){
                 it('should resolve by creating a new instance of given function', function() {
 
                     const container = new Container({
-                        resolver: new Resolvers.ParamListPrepender()
+                        injector: new Injectors.ParamListPrepender()
                     });
 
                     container.factory('TestClass', TestClass);
@@ -143,7 +143,7 @@ describe('Injector container', function (){
                             color: 'super-green'
                         },
                         container = new Container({
-                            resolver: new Resolvers.ParamListPrepender()
+                            injector: new Injectors.ParamListPrepender()
                         });
 
                     container.factory('TestClass', TestClass);
@@ -161,7 +161,7 @@ describe('Injector container', function (){
                 it('should resolve by returning the inherited surrogate constructor function', function() {
 
                     const container = new Container({
-                        resolver: new Resolvers.ParamListPrepender()
+                        injector: new Injectors.ParamListPrepender()
                     });
                     container.factory('TestClass2', TestClass2);
 
@@ -179,7 +179,7 @@ describe('Injector container', function (){
                             color: 'super-green'
                         },
                         container = new Container({
-                            resolver: new Resolvers.ParamListPrepender()
+                            injector: new Injectors.ParamListPrepender()
                         });
 
                     container.factory('TestClass', TestClass);
@@ -220,7 +220,7 @@ describe('Injector container', function (){
                         return a + b + c;
                     };
                     const container = new Container({
-                        resolver: new Resolvers.ParamListPrepender()
+                        injector: new Injectors.ParamListPrepender()
                     });
 
                     container.function('TestFunction', testFunction);
@@ -240,7 +240,7 @@ describe('Injector container', function (){
                     };
 
                     const container = new Container({
-                        resolver: new Resolvers.ParamListPrepender()
+                        injector: new Injectors.ParamListPrepender()
                     });
                     container.function('TestFunction', testFunction);
                     container.factory('TestClass2', TestClass2);
@@ -353,7 +353,7 @@ describe('Injector container', function (){
             expect(childScopeSimple.scope).to.be.equal('scope-name-from-string');
         });
 
-        it('should use the parent\'s resolver by default', function () {
+        it('should use the parent\'s injector by default', function () {
 
             const container = new Container();
 
@@ -361,26 +361,26 @@ describe('Injector container', function (){
                 scope: 'scope-name-from-string'
             });
 
-            expect(childScopeSimple.resolver).to.be.equal(container.resolver);
+            expect(childScopeSimple.injector).to.be.equal(container.injector);
         });
 
-        it('should set the passed resolver for the new child scope', function () {
+        it('should set the passed injector for the new child scope', function () {
 
             const container = new Container();
-            const resolver = new Resolvers.ParamListAppender();
+            const injector = new Injectors.ParamListAppender();
 
             const childScopeFromObject = container.createChild({
                 scope: 'scope-name-from-options-object',
-                resolver: resolver
+                injector: injector
             });
 
-            expect(childScopeFromObject.resolver).to.be.not.equal(container.resolver);
-            expect(childScopeFromObject.resolver).to.be.equal(resolver);
+            expect(childScopeFromObject.injector).to.be.not.equal(container.injector);
+            expect(childScopeFromObject.injector).to.be.equal(injector);
         });
 
-        it('should use the passed resolver for the new child scope', function () {
+        it('should use the passed injector for the new child scope', function () {
 
-            class TestForOverriddenResolver {
+            class TestForOverriddenInjector {
                 constructor(param1, container) {
                     container.resolve('TestClass');
                     this.param1 = param1;
@@ -389,16 +389,16 @@ describe('Injector container', function (){
 
             let test;
             const container = new Container();
-            container.factory('TestForOverriddenResolver', TestForOverriddenResolver);
+            container.factory('TestForOverriddenInjector', TestForOverriddenInjector);
             container.factory('TestClass', TestClass);
             container.factory('TestClass2', TestClass2);
             const childScopeFromObject = container.createChild({
                 scope: 'whatever',
-                resolver: new Resolvers.ParamListAppender()
+                injector: new Injectors.ParamListAppender()
             });
 
             function testResolve() {
-                test = childScopeFromObject.resolve('TestForOverriddenResolver', 'param1');
+                test = childScopeFromObject.resolve('TestForOverriddenInjector', 'param1');
             }
 
             expect(testResolve).to.not.throw();
@@ -423,7 +423,7 @@ describe('Injector container', function (){
             }
 
             const container = new Container({
-                resolver: new Resolvers.ParamListPrepender()
+                injector: new Injectors.ParamListPrepender()
             });
             container.factory('App', App);
             container.factory('Level1', Level1);
@@ -459,7 +459,7 @@ describe('Injector container', function (){
             }
 
             const container = new Container({
-                resolver: new Resolvers.ParamListPrepender()
+                injector: new Injectors.ParamListPrepender()
             });
             container.factory('App', App);
             container.factory('Level1', Level1);
@@ -489,7 +489,7 @@ describe('Injector container', function (){
             }
 
             const container = new Container({
-                resolver: new Resolvers.ParamListPrepender()
+                injector: new Injectors.ParamListPrepender()
             });
             container.factory('App', App);
             container.factory('Level1', Level1);
@@ -511,7 +511,7 @@ describe('Injector container', function (){
             }
 
             const container = new Container({
-                resolver: new Resolvers.ParamListPrepender()
+                injector: new Injectors.ParamListPrepender()
             });
             container.factory('App', App);
 
@@ -534,7 +534,7 @@ describe('Injector container', function (){
             }
 
             const container = new Container({
-                resolver: new Resolvers.ParamListPrepender()
+                injector: new Injectors.ParamListPrepender()
             });
             container.factory('App', App);
 
@@ -579,7 +579,7 @@ describe('Injector container', function (){
             it('should register the factories of scope\'s configObject', function () {
 
                 const container = new Container({
-                    resolver: new Resolvers.ParamListPrepender()
+                    injector: new Injectors.ParamListPrepender()
                 });
                 container.config({
                     factory: {
@@ -823,7 +823,7 @@ describe('Injector container', function (){
 
     describe('Mini integration tests [usage example]', function () {
 
-        describe('SimpleResolver and factory resolution', function () {
+        describe('NoInjection and factory resolution', function () {
 
             let container;
 
@@ -881,7 +881,7 @@ describe('Injector container', function (){
                     dummyObj = {foo: 'bar'};
 
                 const container = new Container({
-                    resolver: new Resolvers.ParamListPrepender()
+                    injector: new Injectors.ParamListPrepender()
                 });
                 container.function('testFunction', testFunction);
 
@@ -897,7 +897,7 @@ describe('Injector container', function (){
 
             beforeEach(function() {
                 container = new Container({
-                    resolver: new Resolvers.ParamListAppender()
+                    injector: new Injectors.ParamListAppender()
                 });
                 container.factory('TestClass', TestClass);
                 container.factory('TestClass2', TestClass2);
@@ -925,7 +925,7 @@ describe('Injector container', function (){
 
             beforeEach(function() {
                 services = new Container({
-                    resolver: new Resolvers.PrototypePoisoner('services')
+                    injector: new Injectors.PrototypePoisoner('services')
                 });
             });
 
@@ -957,7 +957,7 @@ describe('Injector container', function (){
             });
         });
 
-        describe('creating child scope with overridden resolver', function () {
+        describe('creating child scope with overridden injector', function () {
 
             it('should work fine', function () {
 
@@ -965,7 +965,7 @@ describe('Injector container', function (){
                     constructor(container, param1) {
                         const reusableComponentScope = container.createChild({
                             scope: 'reusable-component',
-                            resolver: new Resolvers.ParamListAppender()
+                            injector: new Injectors.ParamListAppender()
                         });
                         this.reusableComponent = reusableComponentScope.resolve('ReusableComponent', param1);
                     }
@@ -1006,7 +1006,7 @@ describe('Injector container', function (){
 
                 let app;
                 const container = new Container({
-                    resolver: new Resolvers.ParamListPrepender()
+                    injector: new Injectors.ParamListPrepender()
                 });
                 container.config(appConfig);
                 container.initScope();
