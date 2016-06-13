@@ -23,7 +23,7 @@ You can read more about Service Locator and other Dependency Injection patterns 
      * [Child containers](#child-containers)
      * [Service shadowing](#service-shadowing)
    * [Service locator container injection strategies](#service-locator-container-injection-strategies)
-     * [Simple resolver (no injection)](#simple-resolver-no-injection)
+     * [No injection](#no-injection)
      * [Parameter list prepender](#parameter-list-prepender)
      * [Parameter list appender](#parameter-list-appender)
      * [Prototype Poisoner](#prototype-poisoner)
@@ -101,7 +101,7 @@ const sumProvider = container.resolveProvider('sum');
 
 
 #### Using one-level deep service container
-After you created your service container you can have it globally (discouraged) or pass it as a parameter through the resolution, to be able to access it from your classes and functions. [For this type of usage you can see examples below](#simple-resolver-no-injection). 
+After you created your service container you can have it globally (discouraged) or pass it as a parameter through the resolution, to be able to access it from your classes and functions. [For this type of usage you can see examples below](#no-injection). 
 
 However Seloin gives you more sophisticated features from creating child containers (scopes) to resolution with auto-injected container. 
 
@@ -111,14 +111,14 @@ With Seloin you can create linked service containers (parent <- child), where yo
 
 - **scope**:*string* - the name of the container, "root" by default
 - **parent**:*Container* - the parent container, null by default
-- **resolver**:*Resolver* - the resolving injection strategy, SimpleResolver by default
+- **injector**:*Injector* - the resolving injection strategy, NoInjection by default
 
 ##### Root container
 When creating a (root) container, you usually don't have to set anything, except if you prefer to use anything other than the default values.
 ```javascript
 const container = new Seloin.Container({
     scope: 'custom-scope-name',
-    resolver: new Seloin.Resolvers.ParamListPrepender()
+    injector: new Seloin.Injectors.ParamListPrepender()
 });
 ```
 ##### Child containers
@@ -131,12 +131,12 @@ const child = container.createChild('child-scope-name');
 // child.parent === container
 ```
 
-When you create a child container usually you only have to specify the scope name of the child container (see above). The parent attribute will be automatically linked for you, and the child scope will inherit the resolver from it's parent scope. However you can override the resolver of the child scope, if you don't want it to inherit from it's parent scope.
+When you create a child container usually you only have to specify the scope name of the child container (see above). The parent attribute will be automatically linked for you, and the child scope will inherit the injector from it's parent scope. However you can override the injector of the child scope, if you don't want it to inherit from it's parent scope.
 ```javascript
 const container = new Seloin.Container();
 const child = container.createChild({
     scope: 'child-scope-name',
-    resolver: new CustomResolver()
+    injector: new CustomInjector()
 });
 ```
 
@@ -164,7 +164,7 @@ const honda = hondaComponent.resolve('Car');
 During resolution you have different ways of having your service locator containers auto-injected. By default there is no auto-injection during the resolution.
 
 
-##### Simple resolver (no injection)
+##### No injection
 
 ###### resolve
 This is the default injection startegy, which has no injection. If you want to access the service locator container from the resolved entity, you have to pass it during resolution.
@@ -185,7 +185,7 @@ const car = container.resolve('Car', 'blue', container);
 ```
 
 ###### resolveProvider
-With this default resolver, resolving the provider just simply returns the originally registered service provider.
+With this default injector, resolving the provider just simply returns the originally registered service provider.
 ```javascript
 class Car {}
 function sum() {}
@@ -215,9 +215,9 @@ class Car {
     }
 }
 
-// Configure the container to use ParamListPreprender resolver to inject the container
+// Configure the container to use ParamListPreprender injector to inject the container
 const container = new Seloin.Container({
-    resolver: new Seloin.Resolvers.ParamListPrepender()
+    injector: new Seloin.Injectors.ParamListPrepender()
 });
 container.factory('Car', Car);
 container.factory('Engine', Engine);
@@ -227,7 +227,7 @@ const car = container.resolve('Car', 'blue');
 ```
 
 ###### resolveProvider
-Resolving the provider of a registered service having the **Parameter list prepender** as the container's resolver will return a modified, auto-injected surrogate class/function. For this reason use the resolveProvider method of **Parameter list prepender** carefully, since everytime it creates a new derived class / wrapped function from the original class/function. The container is auto-injected as the first Parameter, which means that you don't have to pass the container when you create a new instance / call the function of the returned provider.
+Resolving the provider of a registered service having the **Parameter list prepender** as the container's injector will return a modified, auto-injected surrogate class/function. For this reason use the resolveProvider method of **Parameter list prepender** carefully, since everytime it creates a new derived class / wrapped function from the original class/function. The container is auto-injected as the first Parameter, which means that you don't have to pass the container when you create a new instance / call the function of the returned provider.
 
 ```javascript
 class Car {
@@ -242,7 +242,7 @@ function sum(container, a, b) {
 }
 
 const container = new Seloin.Container({
-    resolver: new Seloin.Resolvers.ParamListPrepender()
+    injector: new Seloin.Injectors.ParamListPrepender()
 });
 container.factory('Car', Car);
 container.function('sum', sum);
