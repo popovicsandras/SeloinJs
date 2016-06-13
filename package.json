@@ -1,6 +1,6 @@
 {
   "name": "seloin",
-  "version": "0.0.15",
+  "version": "0.1.0",
   "description": "Yet another javascript Service Locator",
   "repository" :
   {
