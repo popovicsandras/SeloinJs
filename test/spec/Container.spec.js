@@ -1,6 +1,6 @@
 'use strict';
 
-import {Container, Injectors} from '../../lib/seloin';
+import {Container, Injectors} from '../../es6';
 
 class TestClass {
     constructor (container, str, func, obj) {

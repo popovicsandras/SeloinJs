@@ -1,6 +1,6 @@
 'use strict';
 
-import { default as ParamListPrepender } from '../../../lib/Injectors/ParamListPrepender';
+import { default as ParamListPrepender } from '../../../es6/Injectors/ParamListPrepender';
 
 describe('ParamListPrepender', function () {
 

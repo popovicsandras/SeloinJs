@@ -13,7 +13,7 @@ class ServiceType {
     }
 }
 
-export class FactoryService extends ServiceType {
+class FactoryService extends ServiceType {
     constructor(serviceName, serviceProvider) {
         super(serviceName, serviceProvider);
         this.type = FACTORY_TYPE_NAME;
@@ -24,7 +24,7 @@ export class FactoryService extends ServiceType {
     }
 }
 
-export class FunctionService extends ServiceType {
+class FunctionService extends ServiceType {
     constructor(functionName, functionProvider) {
         super(functionName, functionProvider);
         this.type = FUNCTION_TYPE_NAME;
@@ -35,7 +35,7 @@ export class FunctionService extends ServiceType {
     }
 }
 
-export class StaticService extends ServiceType {
+class StaticService extends ServiceType {
     constructor(staticName, staticInstance) {
         super(staticName, staticInstance);
         this.type = STATIC_TYPE_NAME;
@@ -46,7 +46,7 @@ export class StaticService extends ServiceType {
     }
 }
 
-export class ConfigService extends ServiceType {
+class ConfigService extends ServiceType {
     constructor(configName, configInstance) {
         super(configName, configInstance);
         this.type = STATIC_TYPE_NAME;
@@ -56,3 +56,5 @@ export class ConfigService extends ServiceType {
         return CONFIG_TYPE_NAME;
     }
 }
+
+export {FactoryService, FunctionService, StaticService, ConfigService};

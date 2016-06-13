@@ -1,6 +1,6 @@
 'use strict';
 
-import { default as NoInjection } from '../../../lib/Injectors/NoInjection';
+import { default as NoInjection } from '../../../es6/Injectors/NoInjection';
 
 describe('SimpleResolver', function () {
 

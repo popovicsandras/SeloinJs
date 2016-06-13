@@ -3,8 +3,8 @@ var path = require('path'),
 
 module.exports = {
     debug: true,
-    context: path.resolve('lib'),
-    entry: './seloin.js',
+    context: path.resolve('es6'),
+    entry: './index.js',
     output: {
         path: path.join(__dirname, "build"),
         publicPath: '/',
