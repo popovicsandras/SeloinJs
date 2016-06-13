@@ -276,7 +276,7 @@ under implementation
 
 
 #### Container initialization with config objects
-Instead of registering your services manually on containers, you can use config files to wire your application/component. In config files, you can define your factory, function and static services and another configs for child scopes too. 
+Instead of registering your services manually on containers, you can use config objects to wire your application/component. In config objects, you can define your factory, function and static services and another configs for child scopes too. 
 
 ##### Config objects
 The syntax of config file and config object are the following:
@@ -311,7 +311,7 @@ import {appConfig} from 'appConfig';
 
 const rootContainer = new Seloin.Container();
 rootContainer.config(appConfig);
-// rootContainer.resolve('conf:root') === appConfig
+// rootContainer.resolve('config:root') === appConfig
 ```
 
 Now you have the appConfig object registered in you rootContainer under the name of "config:root". To parse this config object and have every service to be registered on the container, you need to initialise the rootContainer scope with the [initScope](#initscope) method.
@@ -330,7 +330,7 @@ import {childConfig} from 'childConfig';
 
 const rootContainer = new Seloin.Container();
 rootContainer.configScope('supa-dupa-scope', childConfig);
-// rootContainer.resolve('conf:supa-dupa-scope') === childConfig
+// rootContainer.resolve('config:supa-dupa-scope') === childConfig
 ```
 
 ##### initScope
@@ -350,16 +350,16 @@ var appConfig = {
         'SampleFunction': SampleFunction
     },
     config: {
-        'child-scope-name': ChildConfig
+        'child-scope-name': childConfig
     }
 };
 
 const rootContainer = new Seloin.Container();
 rootContainer.config(appConfig);
 rootContainer.initScope();
-// rootContainer.resolve('SampleFactory') === SampleFactory
-// rootContainer.resolve('SampleFunction') === SampleFunction
-// rootContainer.resolve('config:child-scope-name') === ChildConfig
+// rootContainer.resolveProvider('SampleFactory') === SampleFactory
+// rootContainer.resolveProvider('SampleFunction') === SampleFunction
+// rootContainer.resolve('config:child-scope-name') === childConfig
 ```
 
 Using initScope usually make sense in two cases:
@@ -384,13 +384,13 @@ var appConfig = {
 const rootContainer = new Seloin.Container();
 rootContainer.config(appConfig);
 rootContainer.initScope();
-// rootContainer.resolve('SampleFactory') === SampleFactory
+// rootContainer.resolveProvider('SampleFactory') === SampleFactory
 // rootContainer.resolve('config:supa-child-scope') === componentConfig
 
 const supaChildScope = rootContainer.createChild('supa-child-scope');
 supaChildScope.initScope();
-// supaChildScope.resolve('SampleFactory') === SampleFactory2
-// supaChildScope.resolve('SampleFunction') === SampleFunction
+// supaChildScope.resolveProvider('SampleFactory') === SampleFactory2
+// supaChildScope.resolveProvider('SampleFunction') === SampleFunction
 ```
 
 For further examples of usage see project's [public directory](https://github.com/popovicsandras/seloin/tree/master/public) on Github for a demo application using Backbone & Marionette with Seloin or the [mini integration tests](https://github.com/popovicsandras/seloin/blob/master/test/spec/Injector.spec.js).

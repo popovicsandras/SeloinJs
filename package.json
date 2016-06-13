@@ -1,6 +1,6 @@
 {
   "name": "seloin",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Yet another javascript Service Locator",
   "repository" :
   {
@@ -11,6 +11,14 @@
   "files": [
     "build",
     "es6"
+  ],
+  "keywords": [
+    "service locator",
+    "service container",
+    "dependency injection",
+    "inversion of control",
+    "ioc",
+    "dependency"
   ],
   "scripts": {
     "start": "webpack-dev-server -d --config webpack.dev-server.config.js",
