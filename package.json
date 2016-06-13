@@ -23,11 +23,13 @@
     "start": "webpack-dev-server -d --config webpack.dev-server.config.js",
     "build:dev": "webpack -d --config webpack-dev-server.config.js",
     "build": "webpack --config webpack.build.config.js && webpack -p --config webpack.buildmin.config.js",
-    "test": "mocha-webpack"
+    "test": "mocha-webpack",
+    "git-add-built": "git add build/*"
   },
   "pre-commit": [
     "test",
-    "build"
+    "build",
+    "git-add-built"
   ],
   "author": "Andras Popovics",
   "license": "ISC",
