@@ -22,6 +22,7 @@
     "backbone.marionette": "marionette#^2.4.5",
     "jquery": "^2.2.3",
     "text": "requirejs-text#^2.0.15",
-    "bootstrap": "~3.3.6"
+    "bootstrap": "~3.3.6",
+    "seloin": "^0.1.2"
   }
 }

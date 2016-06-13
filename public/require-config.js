@@ -16,7 +16,7 @@ requirejs.config({
         }
     },
     paths: {
-        'seloin': '../seloin',
+        'seloin': '../bower_components/seloin/build/seloin.min',
         'backbone': '../bower_components/backbone/backbone-min',
         'backbone.babysitter': '../bower_components/backbone.babysitter/lib/backbone.babysitter.min',
         'backbone.marionette': '../bower_components/backbone.marionette/lib/backbone.marionette.min',
