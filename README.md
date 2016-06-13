@@ -46,6 +46,8 @@ ___
 #### Registering and resolving services
 You can define your services as **factory**, **function** or **static** (singleton).
 
+<br />
+
 ##### Factory
 During resolution of a factory, a new instance of resolved "class" will be returned.
 ```javascript
@@ -62,6 +64,8 @@ const blueCar = container.resolve('Car', 'blue');
 const redCar = container.resolve('Car', 'red');
 ```
 
+<br />
+
 ##### Function
 During resolution of a function, the resolved function will be invoked.
 ```javascript
@@ -75,6 +79,8 @@ container.function('sum', sum);
 const result = container.resolve('sum', 3, 4);
 // result === 7
 ```
+
+<br />
 
 ##### Static (singleton)
 During resolution of a static, the registered object/string/number/chocobo will be returned. Thus, it can act like a singleton.
@@ -90,6 +96,7 @@ const myObject2 = container.resolve('myObject');
 // myObject1 === myObject2 === myObject
 ```
 
+<br />
 
 #### Resolving providers
 In some cases you might need to resolve the originally registered class or function and not the instance or the result of the function. For this reason, you can resolve them with the resolveProvider method.
@@ -108,12 +115,14 @@ const sumProvider = container.resolveProvider('sum');
 // sumProvider === sum
 ```
 
+<br />
 
 #### Using one-level deep service container
 After you created your service container you can have it globally (discouraged) or pass it as a parameter through the resolution, to be able to access it from your classes and functions. [For this type of usage you can see examples below](#no-injection). 
 
 However Seloin gives you more sophisticated features from creating child containers (scopes) to resolution with auto-injected container. 
 
+<br />
 
 #### Nested service containers (scopes)
 With Seloin you can create linked service containers (parent <- child), where you can register your services. Every service container has 3 options to set:
@@ -121,6 +130,8 @@ With Seloin you can create linked service containers (parent <- child), where yo
 - **scope**:*string* - the name of the container, "root" by default
 - **parent**:*Container* - the parent container, null by default
 - **injector**:*Injector* - the resolving injection strategy, NoInjection by default
+
+<br />
 
 ##### Root container
 When creating a (root) container, you usually don't have to set anything, except if you prefer to use anything other than the default values.
@@ -130,6 +141,9 @@ const container = new Seloin.Container({
     injector: new Seloin.Injectors.ParamListPrepender()
 });
 ```
+
+<br />
+
 ##### Child containers
 Creating a (child) container can be done with the **createChild** method. Setting the parent when creating child scopes will be automatically done for you by the **createChild** method. 
 ```javascript
@@ -148,6 +162,8 @@ const child = container.createChild({
     injector: new CustomInjector()
 });
 ```
+
+<br />
 
 ##### Service shadowing
 During the resolution of a service, the service is attempted to be resolved first on the current service container, and bubbles up through the parent containers (if exist) until the root container or until the service is found on any of the parent containers. This means a registered 'Car' service on a parent container will be shadowed by any of its child container 'Car' services, if exists.
@@ -169,9 +185,12 @@ const honda = hondaComponent.resolve('Car');
 // honda is instance of Honda, resolved by hondaComponent since hondaComponent has registered Car service on it
 ```
 
+<br />
+
 #### Service locator container injection strategies
 During resolution you have different ways of having your service locator containers auto-injected. By default there is no auto-injection during the resolution.
 
+<br />
 
 ##### No injection
 
@@ -209,6 +228,7 @@ const sumProvider = container.resolveProvider('sum');
 // sumProvider === sum
 ```
 
+<br />
 
 ##### Parameter list prepender
 
@@ -268,14 +288,17 @@ const result = sumProvider(3, 4);
 // result === 7
 ```
 
+<br />
 
 ##### Parameter list appender
 under implementation
 
+<br />
 
 ##### Prototype Poisoner
 under implementation
 
+<br />
 
 ##### Custom Injection
 
@@ -283,9 +306,12 @@ You can create your own type of service container injection strategy if you want
 
 For working examples, see the code of the already implemented [Injectors](https://github.com/popovicsandras/seloin/tree/master/es6/Injectors).
 
+<br />
 
 #### Container initialization with config objects
 Instead of registering your services manually on containers, you can use config objects to wire your application/component. In config objects, you can define your factory, function and static services and other configs for child scopes too. 
+
+<br />
 
 ##### Config objects
 The syntax of config file and config object are the following:
@@ -308,6 +334,9 @@ var componentConfig = {
     }
 };
 ```
+
+<br />
+
 ##### config
 You can register the configuration object on your container with the **config** method. **Invoking the config method will only register the configuration object you passed in, and not the contents of it.**
 
@@ -325,6 +354,8 @@ rootContainer.config(appConfig);
 
 Now you have the appConfig object registered in you rootContainer under the name of "config:root". To parse this config object and have every service to be registered on the container, you need to initialise the rootContainer scope with the [initScope](#initscope) method.
 
+<br />
+
 ##### configScope
 Beside config method, you have the **configScope** method too, which has 2 parameters:
 - name of the scope (usually child scope)
@@ -341,6 +372,8 @@ const rootContainer = new Seloin.Container();
 rootContainer.configScope('supa-dupa-scope', childConfig);
 // rootContainer.resolve('config:supa-dupa-scope') === childConfig
 ```
+
+<br />
 
 ##### initScope
 The initScope method takes one parameter, the defaultConfigObject, which is optional.
@@ -401,5 +434,7 @@ supaChildScope.initScope();
 // supaChildScope.resolveProvider('SampleFactory') === SampleFactory2
 // supaChildScope.resolveProvider('SampleFunction') === SampleFunction
 ```
+
+<br />
 
 For further examples of usage see project's [public directory](https://github.com/popovicsandras/seloin/tree/master/public) on Github for a demo application using Backbone & Marionette with Seloin or the [mini integration tests](https://github.com/popovicsandras/seloin/blob/master/test/spec/Injector.spec.js).
