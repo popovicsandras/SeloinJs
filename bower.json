@@ -1,27 +1,44 @@
 {
-  "name": "SeloinJs",
-  "description": "Javascript Service Locator Injection library",
-  "main": "index.js",
+  "name": "seloin",
+  "description": "Yet another javascript Service Locator",
+  "main": "build/seloin.js",
   "authors": [
     "Andras Popovics"
   ],
   "license": "ISC",
-  "homepage": "https://github.com/popovicsandras/loc8r",
-  "private": true,
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "public/bower_components/",
-    "test",
-    "tests"
+  "homepage": "https://github.com/popovicsandras/seloin.git",
+  "repository" :
+  {
+    "type" : "git",
+    "url" : "https://github.com/popovicsandras/seloin.git"
+  },
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
   ],
-  "dependencies": {
-    "requirejs": "^2.2.0",
-    "backbone": "^1.3.3",
-    "backbone.marionette": "marionette#^2.4.5",
-    "jquery": "^2.2.3",
-    "text": "requirejs-text#^2.0.15",
-    "bootstrap": "~3.3.6"
-  }
+  "ignore": [
+    ".tmp",
+    "node_modules",
+    "public",
+    "test",
+    ".babelrc",
+    ".bowerrc",
+    ".eslintrc",
+    ".gitignore",
+    ".travis.yml",
+    "mocha-webpack.opts",
+    "package.json",
+    "README.md",
+    "webpack.*"
+  ],
+  "keywords": [
+    "service locator",
+    "service container",
+    "dependency injection",
+    "inversion of control",
+    "ioc",
+    "dependency"
+  ]
 }
+
