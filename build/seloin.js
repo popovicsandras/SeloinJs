@@ -82,17 +82,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _ParamListPrepender2 = _interopRequireDefault(_ParamListPrepender);
 
-	var _PrototypePoisoner = __webpack_require__(11);
-
-	var _PrototypePoisoner2 = _interopRequireDefault(_PrototypePoisoner);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var Injectors = {
 	    NoInjection: _NoInjection2.default,
 	    ParamListAppender: _ParamListAppender2.default,
-	    ParamListPrepender: _ParamListPrepender2.default,
-	    PrototypePoisoner: _PrototypePoisoner2.default
+	    ParamListPrepender: _ParamListPrepender2.default
 	};
 	exports.Injectors = Injectors;
 
@@ -462,7 +457,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function FactoryService(serviceName, serviceProvider) {
 	        _classCallCheck(this, FactoryService);
 
-	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(FactoryService).call(this, serviceName, serviceProvider));
+	        var _this = _possibleConstructorReturn(this, (FactoryService.__proto__ || Object.getPrototypeOf(FactoryService)).call(this, serviceName, serviceProvider));
 
 	        _this.type = FACTORY_TYPE_NAME;
 	        return _this;
@@ -484,7 +479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function FunctionService(functionName, functionProvider) {
 	        _classCallCheck(this, FunctionService);
 
-	        var _this2 = _possibleConstructorReturn(this, Object.getPrototypeOf(FunctionService).call(this, functionName, functionProvider));
+	        var _this2 = _possibleConstructorReturn(this, (FunctionService.__proto__ || Object.getPrototypeOf(FunctionService)).call(this, functionName, functionProvider));
 
 	        _this2.type = FUNCTION_TYPE_NAME;
 	        return _this2;
@@ -506,7 +501,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function StaticService(staticName, staticInstance) {
 	        _classCallCheck(this, StaticService);
 
-	        var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(StaticService).call(this, staticName, staticInstance));
+	        var _this3 = _possibleConstructorReturn(this, (StaticService.__proto__ || Object.getPrototypeOf(StaticService)).call(this, staticName, staticInstance));
 
 	        _this3.type = STATIC_TYPE_NAME;
 	        return _this3;
@@ -528,7 +523,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function ConfigService(configName, configInstance) {
 	        _classCallCheck(this, ConfigService);
 
-	        var _this4 = _possibleConstructorReturn(this, Object.getPrototypeOf(ConfigService).call(this, configName, configInstance));
+	        var _this4 = _possibleConstructorReturn(this, (ConfigService.__proto__ || Object.getPrototypeOf(ConfigService)).call(this, configName, configInstance));
 
 	        _this4.type = STATIC_TYPE_NAME;
 	        return _this4;
@@ -895,7 +890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _inherits(Surrogate, _Service);
 
 	                function Surrogate() {
-	                    var _Object$getPrototypeO;
+	                    var _ref;
 
 	                    _classCallCheck(this, Surrogate);
 
@@ -903,7 +898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        args[_key3] = arguments[_key3];
 	                    }
 
-	                    return _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(Surrogate)).call.apply(_Object$getPrototypeO, [this, injector].concat(args)));
+	                    return _possibleConstructorReturn(this, (_ref = Surrogate.__proto__ || Object.getPrototypeOf(Surrogate)).call.apply(_ref, [this, injector].concat(args)));
 	                }
 
 	                _createClass(Surrogate, null, [{
@@ -947,72 +942,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 
 	exports.default = ParamListPrepender;
-
-/***/ },
-/* 11 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var PrototypePoisoner = function () {
-	    function PrototypePoisoner() {
-	        var name = arguments.length <= 0 || arguments[0] === undefined ? 'injector' : arguments[0];
-
-	        _classCallCheck(this, PrototypePoisoner);
-
-	        this.name = name;
-	    }
-
-	    _createClass(PrototypePoisoner, [{
-	        key: 'factory',
-	        value: function factory(injector, Service) {
-
-	            var prototypePropertyOldValue = Service.prototype[this.name];
-	            Service.prototype[this.name] = injector;
-
-	            for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-	                args[_key - 2] = arguments[_key];
-	            }
-
-	            var service = new (Function.prototype.bind.apply(Service, [null].concat(args)))();
-	            service[this.name] = injector;
-
-	            Service.prototype[this.name] = prototypePropertyOldValue;
-
-	            return service;
-	        }
-	    }, {
-	        key: 'function',
-	        value: function _function(injector, service) {
-	            var context = {};
-	            context[this.name] = injector;
-
-	            for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-	                args[_key2 - 2] = arguments[_key2];
-	            }
-
-	            return service.call.apply(service, [context].concat(args));
-	        }
-	    }, {
-	        key: 'static',
-	        value: function _static(injector, instance) {
-	            return instance;
-	        }
-	    }]);
-
-	    return PrototypePoisoner;
-	}();
-
-	exports.default = PrototypePoisoner;
-	;
 
 /***/ }
 /******/ ])

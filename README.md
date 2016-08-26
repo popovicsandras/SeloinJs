@@ -35,7 +35,6 @@ You can read more about Service Locator and other Dependency Injection patterns 
     * [No injection](#no-injection)
     * [Parameter list prepender](#parameter-list-prepender)
     * [Parameter list appender](#parameter-list-appender)
-    * [Prototype Poisoner](#prototype-poisoner)
     * [Custom Injection](#custom-injection)
 * [Container initialization with config objects](#container-initialization-with-config-objects)
     * [Config objects](#config-objects)
@@ -294,10 +293,6 @@ const result = sumProvider(3, 4);
 #### Parameter list appender
 under implementation
 
-<br />
-
-#### Prototype Poisoner
-under implementation
 
 <br />
 

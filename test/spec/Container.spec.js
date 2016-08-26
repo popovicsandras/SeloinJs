@@ -919,44 +919,6 @@ describe('Injector container', function (){
             });
         });
 
-        describe('PrototypePoisoner with overridden name', function () {
-
-            let services;
-
-            beforeEach(function() {
-                services = new Container({
-                    injector: new Injectors.PrototypePoisoner('services')
-                });
-            });
-
-            it('should work properly in case of extended classes too', function() {
-
-                let appInstance = null;
-                class Base {}
-                class App extends Base {
-                    constructor() {
-                        super();
-                        this.services.resolve('TestClass');
-                        this.services.resolve('TestClass2');
-                    }
-                }
-                class TestClass {}
-                class TestClass2 {}
-
-                services.factory('App', App);
-                services.factory('TestClass', TestClass);
-                services.factory('TestClass2', TestClass2);
-
-                const start = function() {
-                    appInstance = services.resolve('App');
-                };
-
-                expect(start).to.not.throw();
-                expect(appInstance.services).to.be.equal(services);
-                expect(App.prototype.services).to.be.undefined;
-            });
-        });
-
         describe('creating child scope with overridden injector', function () {
 
             it('should work fine', function () {
